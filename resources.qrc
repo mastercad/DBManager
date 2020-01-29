@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>logos/mysql.png</file>
+        <file>logos/sqlite.png</file>
+    </qresource>
+</RCC>
