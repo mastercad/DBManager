@@ -27,10 +27,12 @@ public:
 
 public slots:
     void showFileDialog();
-    bool testConnection();
+    bool validatePage();
 
 private:
     QLineEdit* filePathNameEdit = NULL;
+    QLineEdit* nameEdit = NULL;
+    QLineEdit* sqliteConnectionValid = NULL;
     QSqlDatabase database;
 };
 

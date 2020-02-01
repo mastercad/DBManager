@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>logos/mysql.png</file>
         <file>logos/sqlite.png</file>
+        <file>logos/mysql_medium.png</file>
+        <file>logos/mysql_small.png</file>
+        <file>logos/sqlite_medium.png</file>
+        <file>logos/sqlite_small.png</file>
     </qresource>
 </RCC>

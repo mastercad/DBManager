@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "newconnectionwindow.h"
-#include "connectionwithlogindialog.h"
+#include "connection.h"
 
 #include <QMainWindow>
 #include <QObjectData>
@@ -29,8 +29,9 @@ public slots:
     void newConnectionData(QObjectData& connectionData);
     void onQueryResultHeaderClicked(QStandardItem* item);
     void onListViewClicked(const QModelIndex);
-    void onListViewDoubleClicked(const QModelIndex);
+//    void onListViewDoubleClicked(const QModelIndex);
     void onExecuteQueryClicked();
+//    void handleTableClicked(QModelIndex index);
 
 private:
     Ui::MainWindow *ui;
@@ -44,14 +45,12 @@ private:
     QSqlQuery sendQuery(QString queryString);
 
     NewConnectionWindow* newConnectionWindow = NULL;
-    QSqlDatabase dbConnection;
-    QStandardItemModel* databaseCollection = NULL;
+    Connection dbConnection;
     QString activeDatabase;
     QString activeTable;
 
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
-    QStandardItemModel* queryResultModel = NULL;
     QCompleter* completer = NULL;
 //    QList<DatabaseConnection*>* databaseConnections = NULL;
 };

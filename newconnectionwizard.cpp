@@ -4,6 +4,10 @@
 #include "connectionwizardsqlitepage.h"
 #include "connectionwizardfinalpage.h"
 
+#include <QGridLayout>
+
+#include <QDebug>
+
 NewConnectionWizard::NewConnectionWizard(QWidget* parent)
     : QWizard(parent)
 {
@@ -19,4 +23,25 @@ NewConnectionWizard::NewConnectionWizard(QWidget* parent)
 #endif
 
     setWindowTitle(tr("New Connection-Wizard"));
+/*
+    QWidget * sideWidget = new QWidget();
+    QGridLayout * gridLayout = new QGridLayout();
+    QLabel * label = new QLabel();
+    label->setPixmap(QPixmap(":/logos/mysql.png"));
+    sideWidget->setLayout(gridLayout);
+    gridLayout->addWidget(label);
+    setSideWidget(sideWidget);
+*/
+}
+
+//void NewConnectionWizard::done(int state) {
+//    qDebug() << "Done State: " << state;
+//}
+
+void NewConnectionWizard::setDatabase(QSqlDatabase* database) {
+    this->database = database;
+}
+
+QSqlDatabase* NewConnectionWizard::getDatabase() {
+    return this->database;
 }

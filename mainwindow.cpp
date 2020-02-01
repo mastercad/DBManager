@@ -4,6 +4,7 @@
 #include "textedit.h"
 #include "newconnectionwindow.h"
 #include "newconnectionwizard.h"
+#include "connectionfactory.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -49,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     /*
     TextEdit* completingTextEdit = new TextEdit;
     */
+
+    /*
     completer = new QCompleter(this);
 //    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
     completer->setModel(databaseCollection);
@@ -56,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     ui->queryRequest->setCompleter(completer);
+    */
+
+
 /*
     setCentralWidget(completingTextEdit);
     */
@@ -120,25 +126,75 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::openNewConnectionWindow() {
-    /*
-    QWizard wizard;
-    QWizardPage* page = new QWizardPage();
+    NewConnectionWizard wizard;
+    ConnectionFactory* connectionFactory = new ConnectionFactory;
+    if (wizard.exec()) {
+        dbConnection.close();
 
-    QPushButton* btnMySql = new QPushButton();
-    QPixmap pixmap(":/logos/mysql.png");
-    btnMySql->setIcon(pixmap);
-    btnMySql->setIconSize(QSize(32, 32));
+        dbConnection = connectionFactory->create(wizard);
+        dbConnection.setDatabaseListView(ui->databaseList);
+        dbConnection.setQueryResultView(ui->queryResult);
+        dbConnection.setInformationView(ui->information);
+/*
+        if (!dbConnection.open()) {
+            qDebug() << dbConnection.lastError().text();
+        } else {
+//            setWindowTitle(QString("%1@%2[*] - %3").arg(connectionWithLoginDialogWindow->getUserName()).arg(connectionWithLoginDialogWindow->getHostName()).arg("Database Manager"));
 
-    page->setTitle("New Connection Wizard");
-    page->setSubTitle("Select Connection Type:");
-    page->registerField("ConnectionType", btnMySql);
-    wizard.addPage(page);
-    wizard.exec();
-    */
+            QSqlQuery query(dbConnection);
+//            query.setForwardOnly(true);
+            query.exec("SHOW DATABASES");
 
-    NewConnectionWizard* wizard = new NewConnectionWizard;
-    if (wizard->exec()) {
-        qDebug() << "New Connection established!";
+            if (query.isActive()) {
+                databaseCollection = new QStandardItemModel(query.size(), 1, this);
+                unsigned int row = 0;
+
+                while (query.next()) {
+                    QStandardItem* item = new QStandardItem(query.value(0).toString());
+                    item->setEditable(false);
+                    item->setToolTip(databaseName);
+                    databaseCollection->setItem(row, 0, item);
+                    ++row;
+                    qDebug() << query.value(0).toString();
+                }
+                ui->databaseList->header()->hide();
+                ui->databaseList->setModel(databaseCollection);
+                completer->setModel(databaseCollection);
+                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
+                connect(ui->databaseList, SIGNAL(clicked(QModelIndex)), this, SLOT(onListViewClicked(const QModelIndex)));
+
+                collectTableInformations();
+            } else {
+                qDebug() << "Problem Show Databases!";
+                qDebug() << dbConnection.lastError();
+            }
+
+            query.exec("SELECT name FROM sqlite_master WHERE type='table';");
+
+            if (query.isActive()) {
+                qDebug() << "Treffer " << query.size();
+                databaseCollection = new QStandardItemModel();
+                unsigned int row = 0;
+
+                while (query.next()) {
+                    QStandardItem* item = new QStandardItem(query.value(0).toString());
+                    item->setEditable(false);
+                    item->setToolTip(databaseName);
+                    databaseCollection->setItem(row, 0, item);
+                    ++row;
+                    qDebug() << query.value(0).toString();
+                }
+                ui->databaseList->header()->hide();
+                ui->databaseList->setModel(databaseCollection);
+                completer->setModel(databaseCollection);
+//                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
+                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleTableClicked(QModelIndex)));
+            } else {
+                qDebug() << "Problem Show Databases!";
+                qDebug() << dbConnection.lastError();
+            }
+        }
+        */
     }
 /*
     newConnectionWindow = new NewConnectionWindow();
@@ -187,6 +243,7 @@ void MainWindow::openNewConnectionWindow() {
 }
 
 void MainWindow::onExecuteQueryClicked() {
+    /*
     QString queryString = ui->queryRequest->toPlainText();
     QSqlQuery query = sendQuery(queryString);
 
@@ -216,7 +273,9 @@ void MainWindow::onExecuteQueryClicked() {
         }
     }
     ui->queryResult->setModel(queryResultModel);
+    ui->queryResult->resizeColumnsToContents();
     statusBar()->showMessage("connected!");
+    */
 }
 
 void MainWindow::newConnectionData(QObjectData& connectionData) {
@@ -242,221 +301,8 @@ void MainWindow::onListViewClicked(const QModelIndex index) {
     */
 }
 
-void MainWindow::collectTableInformations() {
-    QSqlQuery query(dbConnection);
-    switchDatabase("information_schema");
-
-//    QList<QString> ignoredTables = {"mysql", "information_schema", "performance_schema", "sys"};
-
-    // foreign key from
-    // foreign key to
-    // foreign key id
-
-    // select foreign keys
-    query.exec("SELECT * FROM INNODB_FOREIGN");
-    query.exec("SELECT * FROM INNODB_FOREIGN_COLS");
-
-    query.exec("SELECT * FROM STATISTICS");
-
-    // detailierte informationen über keys der tabellen
-    query.exec("SELECT * FROM KEY_COLUMN_USAGES");
-
-    query.exec("SELECT * FROM TABLES");
-
-    query.exec("SELECT * FROM TABLE_CONSTRAINTS");
-
-    query.exec("SELECT * FROM COLUMNS");
-
-    query.exec("SELECT * FROM SCHEMATA");
-
-    query.exec("SELECT * FROM KEYWORDS");
-    keywords.clear();
-    if (query.isActive()) {
-        while (query.next()) {
-            QSqlRecord currentRecord = query.record();
-            keywords.insert(currentRecord.field(0).value().toString(), currentRecord.field(1).value().toBool());
-        }
-    }
-    qDebug() << keywords;
-
-    switchDatabase(databaseName);
-}
-
-void MainWindow::onListViewDoubleClicked(const QModelIndex index) {
-    qDebug() << "DOUBLE CLICK!";
-    ui->databaseList->setItemsExpandable(true);
-    QStandardItem* currentItem = databaseCollection->itemFromIndex(index);
-
-    if (0 == currentItem) {
-        return;
-    }
-
-    // habe kein parent => ist eine datenbank
-    if (0 == currentItem->parent()) {
-        handleDatabaseClicked(index);
-    } else {
-        handleTableClicked(currentItem);
-    }
-}
-
-void MainWindow::handleDatabaseClicked(QModelIndex index) {
-    qDebug() << "############# DATABASE Clicked!";
-
-    QString databaseName = databaseCollection->data(index).toString();
-    if (!switchDatabase(databaseName)) {
-        return;
-    }
-
-    QSqlQuery query = sendQuery("SHOW TABLES");
-
-    int row = index.row();
-    int column = index.column();
-
-    // 172.19.2.2
-    if (query.isActive()) {
-        emit databaseCollection->layoutAboutToBeChanged();
-        databaseCollection->item(row, column)->removeRows(0, databaseCollection->item(row)->rowCount());
-        qDebug() << "Gefundene Tabellen: " << query.size();
-        while (query.next()) {
-            QString tableName = query.value(0).toString();
-            QStandardItem* item = new QStandardItem(tableName);
-            item->setToolTip(tableName);
-            item->setEditable(false);
-            databaseCollection->item(row, column)->appendRow(item);
-        }
-        emit databaseCollection->layoutChanged();
-    }
-}
-
-QSqlQuery MainWindow::sendQuery(QSqlQuery query) {
-
-    QElapsedTimer timer;
-    timer.start();
-    query.exec();
-    lastQueryTime = timer.elapsed();
-
-    if (query.isActive()) {
-        ui->information->append(QString(query.lastQuery()+" in %1ms.").arg(lastQueryTime));
-    } else {
-        ui->information->append(query.lastError().text());
-    }
-    return query;
-}
-
-QSqlQuery MainWindow::sendQuery(QString queryString) {
-
-    QSqlQuery query(dbConnection);
-    query.prepare(queryString);
-    return sendQuery(query);
-}
-
-bool MainWindow::switchDatabase(QString databaseName) {
-    qDebug() << databaseName;
-
-    if (dbConnection.isOpen()) {
-        dbConnection.close();
-    }
-
-    dbConnection.setDatabaseName(databaseName);
-
-    if (!dbConnection.open()) {
-        qDebug() << dbConnection.lastError();
-        return false;
-    }
-    return true;
-}
-
-void MainWindow::handleTableClicked(QStandardItem* item) {
-    // 172.19.2.2
-    activeDatabase = QString(item->parent()->text());
-    activeTable = item->text();
-
-    // make sure between multiple databases, the correct database to clicked table is connected
-    switchDatabase(activeDatabase);
-
-    qDebug() << "************* TABLE " << activeTable << " clicked!";
-    qDebug() << "datenbank name:" << activeDatabase;
-
-    delete queryResultModel;
-    queryResultModel = new QStandardItemModel;
-
-    QSqlQuery query = sendQuery("SELECT * FROM "+activeTable);
-
-//    qDebug() << "Time: " << QDateTime::fromMSecsSinceEpoch(timer.elapsed()).toUTC().toString("hh:mm:ss");
-
-    if (query.isActive()) {
-        QSqlRecord localRecord = query.record();
-        for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
-            QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
-            queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
-//                qDebug() << "FieldName: " << localRecord.fieldName(currentPos);
-//                qDebug() << "Field: " << localRecord.field(currentPos).name();
-//                qDebug() << "Field: " << localRecord.field(currentPos).type();
-//                qDebug() << "Field: " << localRecord.field(currentPos).typeID();
-        }
-
-        query.seek(-1);
-
-        int currentRow = 0;
-        while (query.next()) {
-            QSqlRecord currentRecord = query.record();
-            for (int currentColumn = 0; currentColumn < currentRecord.count(); ++currentColumn) {
-                QStandardItem* value = new QStandardItem(currentRecord.field(currentColumn).value().toString());
-                queryResultModel->setItem(currentRow, currentColumn, value);
-            }
-            ++currentRow;
-        }
-    }
-    ui->queryResult->setModel(queryResultModel);
-    statusBar()->showMessage("connected!");
-}
-
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {
 
-}
-
-QString MainWindow::generateLastExecutedQuery(const QSqlQuery& query) {
-    /*
-    QString sql = query.executedQuery();
-    int nbBindValues = query.boundValues().size();
-
-    for(int i = 0, j = 0; j < nbBindValues;) {
-        int s = sql.indexOf(QLatin1Char('\''), i);
-        i = sql.indexOf(QLatin1Char('?'), i);
-        if (i < 1) {
-            break;
-        }
-
-        if (s < i && s > 0) {
-            i = sql.indexOf(QLatin1Char('\''), s + 1) + 1;
-            if(i < 2) {
-                break;
-            }
-        } else {
-            const QVariant &var = query.boundValue(j);
-            QSqlField field(QLatin1String(""), var.type());
-            if (var.isNull()) {
-                field.clear();
-            } else {
-                field.setValue(var);
-            }
-            QString formatV = query.driver()->formatValue(field);
-            sql.replace(i, 1, formatV);
-            i += formatV.length();
-            ++j;
-        }
-    }
-
-    return sql;
-    */
-    QString str = query.lastQuery();
-    QMapIterator<QString, QVariant> it(query.boundValues());
-
-    while (it.hasNext()) {
-        it.next();
-        str.replace(it.key(), it.value().toString());
-    }
-    return str;
 }
 
 void MainWindow::createToolbars() {
@@ -487,5 +333,5 @@ void MainWindow::createToolbars() {
 MainWindow::~MainWindow() {
     delete ui;
     delete newConnectionWindow;
-    delete queryResultModel;
+//    delete queryResultModel;
 }

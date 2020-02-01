@@ -33,8 +33,6 @@ SOURCES += \
     mainwindow.cpp \
     newconnectionwindow.cpp \
     textedit.cpp \
-    mysqlconnection.cpp \
-    sqliteconnection.cpp \
     connectionfactory.cpp \
     connectionwithlogindialog.cpp \
     connectionwithfiledialog.cpp \
@@ -42,14 +40,15 @@ SOURCES += \
     connectionwizardintropage.cpp \
     connectionwizardmysqlpage.cpp \
     connectionwizardsqlitepage.cpp \
-    connectionwizardfinalpage.cpp
+    connectionwizardfinalpage.cpp \
+    connection.cpp \
+    mysqlconnection.cpp \
+    sqliteconnection.cpp
 
 HEADERS += \
     mainwindow.h \
     newconnectionwindow.h \
     textedit.h \
-    mysqlconnection.h \
-    sqliteconnection.h \
     connectionfactory.h \
     connectionwithlogindialog.h \
     connectionwithfiledialog.h \
@@ -57,7 +56,10 @@ HEADERS += \
     connectionwizardintropage.h \
     connectionwizardmysqlpage.h \
     connectionwizardsqlitepage.h \
-    connectionwizardfinalpage.h
+    connectionwizardfinalpage.h \
+    connection.h \
+    mysqlconnection.h \
+    sqliteconnection.h
 
 FORMS += \
     mainwindow.ui \

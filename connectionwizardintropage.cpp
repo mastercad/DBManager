@@ -8,7 +8,9 @@ ConnectionWizardIntroPage::ConnectionWizardIntroPage(QWidget* parent)
     : QWizardPage(parent)
 {
     setTitle("Introduction");
-    setPixmap(QWizard::BackgroundPixmap, QPixmap(":/logos/mysql.png"));
+//    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/logos/mysql.png"));
+
+//    setPixmap(QWizard::LogoPixmap, QPixmap(":/logos/mysql.png"));
 
     topLabel = new QLabel(tr("This wizard will help you register your copy of"));
     topLabel->setWordWrap(true);
@@ -26,25 +28,28 @@ ConnectionWizardIntroPage::ConnectionWizardIntroPage(QWidget* parent)
     layout->addWidget(btnMysqlConnection);
     layout->addWidget(btnSqliteConnection);
     setLayout(layout);
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
     connect(btnMysqlConnection, SIGNAL(clicked(bool)), this, SLOT(selectMysqlConnection()));
     connect(btnSqliteConnection, SIGNAL(clicked(bool)), this, SLOT(selectSqliteConnection()));
 }
 
 void ConnectionWizardIntroPage::selectMysqlConnection() {
-    if (Type_Mysql == selectedType) {
-        selectedType = -1;
-    } else {
+//    if (Type_Mysql == selectedType) {
+//        selectedType = -1;
+//    } else {
         selectedType = Type_Mysql;
-    }
+        wizard()->next();
+//    }
 }
 
 void ConnectionWizardIntroPage::selectSqliteConnection() {
-    if (Type_Sqlite == selectedType) {
-        selectedType = -1;
-    } else {
+//    if (Type_Sqlite == selectedType) {
+//        selectedType = -1;
+//    } else {
         selectedType = Type_Sqlite;
-    }
+        wizard()->next();
+//    }
 }
 
 int ConnectionWizardIntroPage::nextId() const {

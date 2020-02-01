@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QSqlDatabase>
 
 class ConnectionWizardMysqlPage : public QWizardPage
@@ -25,7 +26,7 @@ public:
     int nextId() const override;
 
 public slots:
-    bool testConnection();
+    bool validatePage();
 
 private:
     QLineEdit* nameEdit = NULL;
@@ -34,6 +35,8 @@ private:
     QLineEdit* userEdit = NULL;
     QLineEdit* passwordEdit = NULL;
     QLineEdit* databaseEdit = NULL;
+    QLineEdit* mysqlConnectionValidEdit = NULL;
+    QTextEdit* informationTextEdit = NULL;
     QPushButton* btnTestConnection = new QPushButton(tr("&Test connection"));
     int selectedType = -1;
     QSqlDatabase database;
