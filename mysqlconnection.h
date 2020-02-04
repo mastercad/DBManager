@@ -20,9 +20,6 @@ private:
     uint port;
     QString databaseName;
 
-    QString activeTableName;
-    QString activeDatabaseName;
-
     QStandardItemModel* databaseCollection = NULL;
 
 public slots:
@@ -48,6 +45,7 @@ public:
     QString getDatabaseName() const;
 
     void collectTableInformations();
+    void loadDatabaseList();
 };
 
 #endif // MYSQLCONNECTION_H

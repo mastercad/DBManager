@@ -11,8 +11,10 @@ class SqliteConnection : public Connection
 private:
     QString databasePath;
     QString databaseName;
-    QString activeTableName;
     void handleTableClicked(QModelIndex index);
+    void loadDatabaseList();
+    void loadTablesList();
+
 public:
     SqliteConnection();
     void init();
@@ -22,6 +24,9 @@ public:
 
     void setDatabasePath(QString databasePath);
     QString getDatabasePath() const;
+
+public slots:
+    void onListViewDoubleClicked(const QModelIndex index);
 };
 
 #endif // SQLITECONNECTION_H

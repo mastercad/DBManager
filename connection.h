@@ -1,6 +1,9 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include "textedit.h"
+
+#include <QObject>
 #include <QModelIndex>
 #include <QTreeView>
 #include <QTableView>
@@ -9,6 +12,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QTextEdit>
+#include <QCompleter>
 
 class Connection
 {
@@ -18,22 +22,23 @@ private:
 protected:
     QSqlDatabase database;
 
-    QSqlQuery sendQuery(QSqlQuery query);
-    QSqlQuery sendQuery(QString queryString);
+    QString activeTableName;
+    QString activeDatabaseName;
 
     QTreeView* databaseListView = NULL;
     QTableView* queryResultView = NULL;
+    TextEdit* queryRequestView = NULL;
     QTextEdit* informationView = NULL;
-
+    QCompleter* completer = NULL;
     QStandardItemModel* databaseCollection = NULL;
-
     QStandardItemModel* queryResultModel = NULL;
 
 public:
     Connection();
     ~Connection();
 
-//    virtual void init();
+    virtual void init() = 0;
+    virtual void loadDatabaseList() = 0;
 
 //    virtual void collectionTableInformations();
 
@@ -42,6 +47,9 @@ public:
 
     void setQueryResultView(QTableView* queryResultView);
     QTableView* getQueryResultView() const;
+
+    void setQueryRequestView(TextEdit* queryRequestView);
+    TextEdit* getQueryRequestView() const;
 
     void setInformationView(QTextEdit* informationView);
     QTextEdit* getInformationView() const;
@@ -52,8 +60,11 @@ public:
     void close();
     bool open();
 
+    QSqlQuery sendQuery(QSqlQuery query);
+    QSqlQuery sendQuery(QString queryString);
+
 //public slots:
-//    void onListViewDoubleClicked(QModelIndex index);
+    virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
 };
 
 #endif // CONNECTION_H

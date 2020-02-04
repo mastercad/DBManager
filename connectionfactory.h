@@ -9,7 +9,7 @@
 class ConnectionFactory
 {
 public:
-    Connection create(NewConnectionWizard& wizard);
+    Connection* create(NewConnectionWizard& wizard);
 };
 
 #endif // CONNECTIONFACTORY_H

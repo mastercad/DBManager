@@ -97,13 +97,14 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
 
 bool ConnectionWizardMysqlPage::validatePage() {
     database.close();
-    database.setHostName(hostEdit->text());
+    database.setHostName(!hostEdit->text().isEmpty() ? hostEdit->text() : "localhost");
 
     if (!databaseEdit->text().isEmpty()) {
         database.setDatabaseName(databaseEdit->text());
     }
-    database.setUserName(userEdit->text());
-    database.setPassword(passwordEdit->text());
+    database.setPort(!portEdit->text().isNull() ? portEdit->text().toUInt() : 3306);
+    database.setUserName(!userEdit->text().isEmpty() ? userEdit->text() : "root");
+    database.setPassword(!passwordEdit->text().isEmpty() ? passwordEdit->text() : "root");
     database.open();
 
     if (database.isOpen()) {

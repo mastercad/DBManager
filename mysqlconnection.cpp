@@ -1,52 +1,16 @@
 #include "mysqlconnection.h"
 
-#include <QDebug>
+#include <QStandardItemModel>
+#include <QHeaderView>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlField>
+#include <QModelIndex>
+
+#include <QDebug>
 
 MysqlConnection::MysqlConnection() {
 
-}
-
-void MysqlConnection::setHost(QString host) {
-    this->host = host;
-}
-
-QString MysqlConnection::getHost() const {
-    return this->host;
-}
-
-void MysqlConnection::setUser(QString user) {
-    this->user = user;
-}
-
-QString MysqlConnection::getUser() const {
-    return this->user;
-}
-
-void MysqlConnection::setPassword(QString password) {
-    this->password = password;
-}
-
-QString MysqlConnection::getPassword() const {
-    return this->password;
-}
-
-void MysqlConnection::setPort(uint port) {
-    this->port = port;
-}
-
-uint MysqlConnection::getPort() const {
-    return this->port;
-}
-
-void MysqlConnection::setDatabaseName(QString databaseName) {
-    this->databaseName = databaseName;
-}
-
-QString MysqlConnection::getDatabaseName() const {
-    return this->databaseName;
 }
 
 void MysqlConnection::init() {
@@ -55,6 +19,47 @@ void MysqlConnection::init() {
     database.setPort(this->getPort());
     database.setUserName(this->getUser());
     database.setPassword(this->getPassword());
+}
+
+void MysqlConnection::loadDatabaseList() {
+    qDebug() << "MysqlConnection::loadDatabaseList";
+    database.open();
+    QSqlQuery query(database);
+//            query.setForwardOnly(true);
+    query.exec("SHOW DATABASES");
+
+    if (query.isActive()) {
+        databaseCollection = new QStandardItemModel(query.size(), 1);
+        unsigned int row = 0;
+
+        while (query.next()) {
+            QStandardItem* item = new QStandardItem(query.value(0).toString());
+            item->setEditable(false);
+            item->setToolTip(databaseName);
+            databaseCollection->setItem(row, 0, item);
+            ++row;
+            qDebug() << query.value(0).toString();
+        }
+        getDatabaseListView()->header()->hide();
+        getDatabaseListView()->setModel(databaseCollection);
+
+        completer = new QCompleter();
+    //    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
+        completer->setModel(databaseCollection);
+        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+        completer->setCaseSensitivity(Qt::CaseInsensitive);
+        completer->setWrapAround(false);
+        getQueryRequestView()->setCompleter(completer);
+
+//        completer->setModel(databaseCollection);
+//        QObject::connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
+//        connect(getDatabaseListView(), SIGNAL(clicked(QModelIndex)), this, SLOT(onListViewClicked(const QModelIndex)));
+
+        collectTableInformations();
+    } else {
+        qDebug() << "Problem Show Databases!";
+        qDebug() << database.lastError();
+    }
 }
 
 void MysqlConnection::onListViewDoubleClicked(const QModelIndex index) {
@@ -204,4 +209,44 @@ bool MysqlConnection::switchDatabase(QString databaseName) {
         return false;
     }
     return true;
+}
+
+void MysqlConnection::setHost(QString host) {
+    this->host = host;
+}
+
+QString MysqlConnection::getHost() const {
+    return this->host;
+}
+
+void MysqlConnection::setUser(QString user) {
+    this->user = user;
+}
+
+QString MysqlConnection::getUser() const {
+    return this->user;
+}
+
+void MysqlConnection::setPassword(QString password) {
+    this->password = password;
+}
+
+QString MysqlConnection::getPassword() const {
+    return this->password;
+}
+
+void MysqlConnection::setPort(uint port) {
+    this->port = port;
+}
+
+uint MysqlConnection::getPort() const {
+    return this->port;
+}
+
+void MysqlConnection::setDatabaseName(QString databaseName) {
+    this->databaseName = databaseName;
+}
+
+QString MysqlConnection::getDatabaseName() const {
+    return this->databaseName;
 }

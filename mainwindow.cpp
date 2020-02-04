@@ -4,7 +4,6 @@
 #include "textedit.h"
 #include "newconnectionwindow.h"
 #include "newconnectionwizard.h"
-#include "connectionfactory.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -45,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     QMainWindow::showMaximized();
+    connectionFactory = new ConnectionFactory;
     setWindowTitle(QString("%1").arg("Database Manager"));
 
     /*
@@ -122,130 +122,35 @@ MainWindow::MainWindow(QWidget *parent) :
 */
     ui->queryResult->setSortingEnabled(true);
     connect(ui->btnQueryExecute, SIGNAL(clicked(bool)), this, SLOT(onExecuteQueryClicked()));
+    connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(close()));
     connect(ui->actionNewConnection, SIGNAL(triggered(bool)), this, SLOT(openNewConnectionWindow()));
 }
 
 void MainWindow::openNewConnectionWindow() {
     NewConnectionWizard wizard;
-    ConnectionFactory* connectionFactory = new ConnectionFactory;
     if (wizard.exec()) {
-        dbConnection.close();
+        if (NULL != dbConnection) {
+            dbConnection->close();
+        }
 
         dbConnection = connectionFactory->create(wizard);
-        dbConnection.setDatabaseListView(ui->databaseList);
-        dbConnection.setQueryResultView(ui->queryResult);
-        dbConnection.setInformationView(ui->information);
-/*
-        if (!dbConnection.open()) {
-            qDebug() << dbConnection.lastError().text();
-        } else {
-//            setWindowTitle(QString("%1@%2[*] - %3").arg(connectionWithLoginDialogWindow->getUserName()).arg(connectionWithLoginDialogWindow->getHostName()).arg("Database Manager"));
+        dbConnection->setDatabaseListView(ui->databaseList);
+        dbConnection->setQueryResultView(ui->queryResult);
+        dbConnection->setQueryRequestView(ui->queryRequest);
+        dbConnection->setInformationView(ui->information);
+        dbConnection->loadDatabaseList();
 
-            QSqlQuery query(dbConnection);
-//            query.setForwardOnly(true);
-            query.exec("SHOW DATABASES");
-
-            if (query.isActive()) {
-                databaseCollection = new QStandardItemModel(query.size(), 1, this);
-                unsigned int row = 0;
-
-                while (query.next()) {
-                    QStandardItem* item = new QStandardItem(query.value(0).toString());
-                    item->setEditable(false);
-                    item->setToolTip(databaseName);
-                    databaseCollection->setItem(row, 0, item);
-                    ++row;
-                    qDebug() << query.value(0).toString();
-                }
-                ui->databaseList->header()->hide();
-                ui->databaseList->setModel(databaseCollection);
-                completer->setModel(databaseCollection);
-                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
-                connect(ui->databaseList, SIGNAL(clicked(QModelIndex)), this, SLOT(onListViewClicked(const QModelIndex)));
-
-                collectTableInformations();
-            } else {
-                qDebug() << "Problem Show Databases!";
-                qDebug() << dbConnection.lastError();
-            }
-
-            query.exec("SELECT name FROM sqlite_master WHERE type='table';");
-
-            if (query.isActive()) {
-                qDebug() << "Treffer " << query.size();
-                databaseCollection = new QStandardItemModel();
-                unsigned int row = 0;
-
-                while (query.next()) {
-                    QStandardItem* item = new QStandardItem(query.value(0).toString());
-                    item->setEditable(false);
-                    item->setToolTip(databaseName);
-                    databaseCollection->setItem(row, 0, item);
-                    ++row;
-                    qDebug() << query.value(0).toString();
-                }
-                ui->databaseList->header()->hide();
-                ui->databaseList->setModel(databaseCollection);
-                completer->setModel(databaseCollection);
-//                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
-                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleTableClicked(QModelIndex)));
-            } else {
-                qDebug() << "Problem Show Databases!";
-                qDebug() << dbConnection.lastError();
-            }
-        }
-        */
+        connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
     }
-/*
-    newConnectionWindow = new NewConnectionWindow();
-//    connectionWithLoginDialogWindow->setHostName(hostName);
+}
 
-    if (NewConnectionWindow::Accepted == newConnectionWindow->exec()) {
-        dbConnection = QSqlDatabase::addDatabase("QMYSQL", "mysql");
-//        dbConnection.setHostName(connectionWithLoginDialogWindow->getHostName());
-//        dbConnection.setDatabaseName(connectionWithLoginDialogWindow->getDatabase());
-//        dbConnection.setPort(connectionWithLoginDialogWindow->getPort().toInt());
-//        dbConnection.setUserName(connectionWithLoginDialogWindow->getUserName());
-//        dbConnection.setPassword(connectionWithLoginDialogWindow->getPassword());
-
-        if (!dbConnection.open()) {
-            qDebug() << dbConnection.lastError().text();
-        } else {
-//            setWindowTitle(QString("%1@%2[*] - %3").arg(connectionWithLoginDialogWindow->getUserName()).arg(connectionWithLoginDialogWindow->getHostName()).arg("Database Manager"));
-
-            QSqlQuery query(dbConnection);
-            query.setForwardOnly(true);
-            query.exec("SHOW DATABASES");
-
-            if (query.isActive()) {
-                databaseCollection = new QStandardItemModel(query.size(), 1, this);
-                unsigned int row = 0;
-
-                while (query.next()) {
-                    QStandardItem* item = new QStandardItem(query.value(0).toString());
-                    item->setEditable(false);
-                    item->setToolTip(databaseName);
-                    databaseCollection->setItem(row, 0, item);
-                    ++row;
-                    qDebug() << query.value(0).toString();
-                }
-                ui->databaseList->header()->hide();
-                ui->databaseList->setModel(databaseCollection);
-                completer->setModel(databaseCollection);
-                connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
-                connect(ui->databaseList, SIGNAL(clicked(QModelIndex)), this, SLOT(onListViewClicked(const QModelIndex)));
-            }
-
-            collectTableInformations();
-        }
-    }
-*/
+void MainWindow::onListViewDoubleClicked(const QModelIndex index) {
+    dbConnection->onListViewDoubleClicked(index);
 }
 
 void MainWindow::onExecuteQueryClicked() {
-    /*
     QString queryString = ui->queryRequest->toPlainText();
-    QSqlQuery query = sendQuery(queryString);
+    QSqlQuery query = dbConnection->sendQuery(queryString);
 
     QStandardItemModel* queryResultModel = new QStandardItemModel;
 
@@ -275,7 +180,6 @@ void MainWindow::onExecuteQueryClicked() {
     ui->queryResult->setModel(queryResultModel);
     ui->queryResult->resizeColumnsToContents();
     statusBar()->showMessage("connected!");
-    */
 }
 
 void MainWindow::newConnectionData(QObjectData& connectionData) {

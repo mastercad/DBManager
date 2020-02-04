@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "newconnectionwindow.h"
+#include "connectionfactory.h"
 #include "connection.h"
 
 #include <QMainWindow>
@@ -13,7 +14,7 @@
 class QTreeModel;
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -29,9 +30,8 @@ public slots:
     void newConnectionData(QObjectData& connectionData);
     void onQueryResultHeaderClicked(QStandardItem* item);
     void onListViewClicked(const QModelIndex);
-//    void onListViewDoubleClicked(const QModelIndex);
+    void onListViewDoubleClicked(const QModelIndex);
     void onExecuteQueryClicked();
-//    void handleTableClicked(QModelIndex index);
 
 private:
     Ui::MainWindow *ui;
@@ -45,14 +45,14 @@ private:
     QSqlQuery sendQuery(QString queryString);
 
     NewConnectionWindow* newConnectionWindow = NULL;
-    Connection dbConnection;
+    Connection* dbConnection = NULL;
     QString activeDatabase;
     QString activeTable;
+    ConnectionFactory* connectionFactory = NULL;
 
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = NULL;
-//    QList<DatabaseConnection*>* databaseConnections = NULL;
 };
 
 #endif // MAINWINDOW_H

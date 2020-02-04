@@ -3,6 +3,8 @@
 #include <QString>
 #include <QElapsedTimer>
 
+#include <QDebug>
+
 Connection::Connection()
 {
 
@@ -43,6 +45,14 @@ void Connection::setQueryResultView(QTableView *queryResultView) {
 
 QTableView* Connection::getQueryResultView() const {
     return this->queryResultView;
+}
+
+void Connection::setQueryRequestView(TextEdit *queryRequestView) {
+    this->queryRequestView = queryRequestView;
+}
+
+TextEdit* Connection::getQueryRequestView() const {
+    return this->queryRequestView;
 }
 
 void Connection::setInformationView(QTextEdit *informationView) {
