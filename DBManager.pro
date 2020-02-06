@@ -43,7 +43,11 @@ SOURCES += \
     connectionwizardfinalpage.cpp \
     connection.cpp \
     mysqlconnection.cpp \
-    sqliteconnection.cpp
+    sqliteconnection.cpp \
+    connectioninfo.cpp \
+    mysqlconnectioninfo.cpp \
+    sqliteconnectioninfo.cpp \
+    connectioninfofactory.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -59,7 +63,11 @@ HEADERS += \
     connectionwizardfinalpage.h \
     connection.h \
     mysqlconnection.h \
-    sqliteconnection.h
+    sqliteconnection.h \
+    connectioninfo.h \
+    mysqlconnectioninfo.h \
+    sqliteconnectioninfo.h \
+    connectioninfofactory.h
 
 FORMS += \
     mainwindow.ui \

@@ -4,6 +4,8 @@
 #include "newconnectionwindow.h"
 #include "connectionfactory.h"
 #include "connection.h"
+#include "connectioninfofactory.h"
+#include "connectioninfo.h"
 
 #include <QMainWindow>
 #include <QObjectData>
@@ -27,10 +29,8 @@ public:
 
 public slots:
     void openNewConnectionWindow();
-    void newConnectionData(QObjectData& connectionData);
+    void onEstablishNewConnection(QAction* action);
     void onQueryResultHeaderClicked(QStandardItem* item);
-    void onListViewClicked(const QModelIndex);
-    void onListViewDoubleClicked(const QModelIndex);
     void onExecuteQueryClicked();
 
 private:
@@ -40,19 +40,29 @@ private:
     void handleTableClicked(QStandardItem* item);
     bool switchDatabase(QString databaseName);
     void collectTableInformations();
+    void storeConnectionInfo(ConnectionInfo* connectionInfo);
+    void createConnectionSubMenu();
+    Connection* establishNewConnection(ConnectionInfo* connectionInfo);
+
     QString generateLastExecutedQuery(const QSqlQuery& query);
     QSqlQuery sendQuery(QSqlQuery query);
     QSqlQuery sendQuery(QString queryString);
 
     NewConnectionWindow* newConnectionWindow = NULL;
     Connection* dbConnection = NULL;
+    ConnectionInfo* connectionInfo= NULL;
+
     QString activeDatabase;
     QString activeTable;
-    ConnectionFactory* connectionFactory = NULL;
 
+    ConnectionFactory* connectionFactory = NULL;
+    ConnectionInfoFactory* connectionInfoFactory = NULL;
+
+    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = NULL;
+    bool connectionsSaved = true;
 };
 
 #endif // MAINWINDOW_H

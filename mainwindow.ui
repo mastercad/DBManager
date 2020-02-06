@@ -71,9 +71,14 @@
     <property name="title">
      <string>Verbindungen</string>
     </property>
+    <widget class="QMenu" name="menuVerbinden">
+     <property name="title">
+      <string>Verbinden</string>
+     </property>
+    </widget>
     <addaction name="actionNewConnection"/>
     <addaction name="actionEditConnection"/>
-    <addaction name="actionConnectionList"/>
+    <addaction name="menuVerbinden"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -109,14 +114,14 @@
     <string>Manager</string>
    </property>
   </action>
-  <action name="actionConnectionList">
-   <property name="text">
-    <string>Verbinden</string>
-   </property>
-  </action>
   <action name="actionClose">
    <property name="text">
     <string>Schließen</string>
+   </property>
+  </action>
+  <action name="actionSubmenu">
+   <property name="text">
+    <string>Submenu</string>
    </property>
   </action>
  </widget>

@@ -25,7 +25,6 @@ QSqlQuery Connection::sendQuery(QSqlQuery query) {
 }
 
 QSqlQuery Connection::sendQuery(QString queryString) {
-
     QSqlQuery query(database);
     query.prepare(queryString);
     return sendQuery(query);
@@ -61,6 +60,14 @@ void Connection::setInformationView(QTextEdit *informationView) {
 
 QTextEdit* Connection::getInformationView() const {
     return this->informationView;
+}
+
+void Connection::setConnectionInfo(ConnectionInfo *connectionInfo) {
+    this->connectionInfo = connectionInfo;
+}
+
+ConnectionInfo* Connection::getConnectionInfo() const {
+    return this->connectionInfo;
 }
 
 QString Connection::generateLastExecutedQuery(const QSqlQuery& query) {

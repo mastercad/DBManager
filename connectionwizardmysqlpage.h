@@ -21,6 +21,7 @@ public:
     };
 
     ConnectionWizardMysqlPage(QWidget* parent = nullptr);
+
     bool isComplete() const;
 
     int nextId() const override;

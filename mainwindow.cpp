@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include "textedit.h"
-#include "newconnectionwindow.h"
 #include "newconnectionwizard.h"
 
 #include <QSqlDatabase>
@@ -21,6 +20,7 @@
 #include <QCompleter>
 #include <QWizard>
 #include <QWizardPage>
+#include <QMenu>
 
 #include <QDebug>
 
@@ -45,85 +45,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QMainWindow::showMaximized();
     connectionFactory = new ConnectionFactory;
+    connectionInfoFactory = new ConnectionInfoFactory;
     setWindowTitle(QString("%1").arg("Database Manager"));
 
-    /*
-    TextEdit* completingTextEdit = new TextEdit;
-    */
-
-    /*
-    completer = new QCompleter(this);
-//    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
-    completer->setModel(databaseCollection);
-    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setWrapAround(false);
-    ui->queryRequest->setCompleter(completer);
-    */
-
-
-/*
-    setCentralWidget(completingTextEdit);
-    */
-
-//    ui->tabWidget->addTab(new GeneralTab(fileInfo), tr("General"));
-//    ui->tabWidget->addTab(new PermissionsTab(fileInfo), tr("Permissions"));
-//    ui->tabWidget->addTab(new ApplicationsTab(fileInfo), tr("Applications"));
-/*
-    dbConnection = QSqlDatabase::addDatabase("QMYSQL", "retro");
-
-    dbConnection.setHostName("172.19.2.2");
-    dbConnection.setDatabaseName("retro");
-    dbConnection.setUserName("root");
-    dbConnection.setPassword("XQW16asZ");
-
-    QSqlDatabase mysqlDb = QSqlDatabase::addDatabase("QMYSQL", "mysql");
-    mysqlDb.setHostName("172.19.2.2");
-    mysqlDb.setDatabaseName("mysql");
-    mysqlDb.setUserName("root");
-    mysqlDb.setPassword("XQW16asZ");
-
-    bool retroOk = retroDb.open();
-    bool mysqlOk = mysqlDb.open();
-
-    qDebug() << "OK: " << retroOk;
-    qDebug() << "OK: " << mysqlOk;
-    qDebug() << "Error: " << retroDb.lastError();
-    qDebug() << "Error: " << mysqlDb.lastError();
-
-    QSqlQuery retroQuery(retroDb);
-    retroQuery.setForwardOnly(true);
-    retroQuery.exec("SHOW DATABASES");
-
-    if (retroQuery.first()) {
-        while (retroQuery.next()) {
-            qDebug() << retroQuery.value(0).toString();
-        }
-    }
-
-    qDebug() << "SHOW TABLES für retro";
-    retroQuery.exec("SHOW TABLES");
-
-    if (retroQuery.first()) {
-        while (retroQuery.next()) {
-            qDebug() << retroQuery.value(0).toString();
-        }
-    }
-
-    QSqlQuery mysqlQuery(mysqlDb);
-    qDebug() << "SHOW TABLES für mysql";
-    mysqlQuery.exec("SHOW TABLES");
-
-    if (mysqlQuery.first()) {
-        while (mysqlQuery.next()) {
-            qDebug() << mysqlQuery.value(0).toString();
-        }
-    }
-*/
     ui->queryResult->setSortingEnabled(true);
     connect(ui->btnQueryExecute, SIGNAL(clicked(bool)), this, SLOT(onExecuteQueryClicked()));
     connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(close()));
     connect(ui->actionNewConnection, SIGNAL(triggered(bool)), this, SLOT(openNewConnectionWindow()));
+    connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
 }
 
 void MainWindow::openNewConnectionWindow() {
@@ -133,19 +62,55 @@ void MainWindow::openNewConnectionWindow() {
             dbConnection->close();
         }
 
-        dbConnection = connectionFactory->create(wizard);
-        dbConnection->setDatabaseListView(ui->databaseList);
-        dbConnection->setQueryResultView(ui->queryResult);
-        dbConnection->setQueryRequestView(ui->queryRequest);
-        dbConnection->setInformationView(ui->information);
-        dbConnection->loadDatabaseList();
-
-        connect(ui->databaseList, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
+        connectionInfo = connectionInfoFactory->create(wizard);
+        storeConnectionInfo(connectionInfo);
+        dbConnection = establishNewConnection(connectionInfo);
+        createConnectionSubMenu();
     }
 }
 
-void MainWindow::onListViewDoubleClicked(const QModelIndex index) {
-    dbConnection->onListViewDoubleClicked(index);
+void MainWindow::createConnectionSubMenu() {
+    ui->menuVerbinden->clear();
+    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
+    while (typeIterator.hasNext()) {
+        typeIterator.next();
+        QMenu* typeMenu = new QMenu(typeIterator.key());
+        QMapIterator<QString, ConnectionInfo*> connectionsIterator(typeIterator.value());
+        while(connectionsIterator.hasNext()) {
+            connectionsIterator.next();
+            typeMenu->addAction(connectionsIterator.key());
+        }
+        ui->menuVerbinden->addMenu(typeMenu);
+    }
+}
+
+void MainWindow::storeConnectionInfo(ConnectionInfo* connectionInfo) {
+    if (!connections.contains(connectionInfo->getConnectionType())) {
+    }
+    QMap<QString, ConnectionInfo*>connectionInfos;
+    connectionInfos[connectionInfo->getConnectionName()] = connectionInfo;
+    connections[connectionInfo->getConnectionType()] = connectionInfos;
+    connectionsSaved = false;
+}
+
+void MainWindow::onEstablishNewConnection(QAction *action) {
+    QWidget* widget = action->parentWidget();
+
+    if (widget) {
+        QMenu* menu = dynamic_cast<QMenu* >(widget);
+        establishNewConnection(connections[menu->title()][action->text()]);
+    }
+}
+
+Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
+    dbConnection = connectionFactory->create(connectionInfo);
+    dbConnection->setDatabaseListView(ui->databaseList);
+    dbConnection->setQueryResultView(ui->queryResult);
+    dbConnection->setQueryRequestView(ui->queryRequest);
+    dbConnection->setInformationView(ui->information);
+    dbConnection->loadDatabaseList();
+
+    return dbConnection;
 }
 
 void MainWindow::onExecuteQueryClicked() {
@@ -159,10 +124,6 @@ void MainWindow::onExecuteQueryClicked() {
         for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
             QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
             queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
-//                qDebug() << "FieldName: " << localRecord.fieldName(currentPos);
-//                qDebug() << "Field: " << localRecord.field(currentPos).name();
-//                qDebug() << "Field: " << localRecord.field(currentPos).type();
-//                qDebug() << "Field: " << localRecord.field(currentPos).typeID();
         }
 
         query.seek(-1);
@@ -180,29 +141,6 @@ void MainWindow::onExecuteQueryClicked() {
     ui->queryResult->setModel(queryResultModel);
     ui->queryResult->resizeColumnsToContents();
     statusBar()->showMessage("connected!");
-}
-
-void MainWindow::newConnectionData(QObjectData& connectionData) {
-    qDebug() << "BESTÄTIGT!";
-}
-
-void MainWindow::onListViewClicked(const QModelIndex index) {
-    qDebug() << "SINGLE CLICK!";
-    /*
-    ui->databaseList->setItemsExpandable(true);
-    QStandardItem* currentItem = databaseCollection->itemFromIndex(index);
-
-    if (0 == currentItem) {
-        return;
-    }
-
-    // habe kein parent => ist eine datenbank
-    if (0 == currentItem->parent()) {
-        handleDatabaseClicked(index);
-    } else {
-        handleTableClicked(currentItem);
-    }
-    */
 }
 
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {

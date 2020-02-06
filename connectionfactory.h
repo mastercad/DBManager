@@ -2,14 +2,12 @@
 #define CONNECTIONFACTORY_H
 
 #include "connection.h"
-#include "newconnectionwizard.h"
-
-#include <QWizard>
+#include "connectioninfo.h"
 
 class ConnectionFactory
 {
 public:
-    Connection* create(NewConnectionWizard& wizard);
+    Connection* create(ConnectionInfo* connectionInfo);
 };
 
 #endif // CONNECTIONFACTORY_H

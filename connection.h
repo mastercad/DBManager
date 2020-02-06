@@ -2,6 +2,7 @@
 #define CONNECTION_H
 
 #include "textedit.h"
+#include "connectioninfo.h"
 
 #include <QObject>
 #include <QModelIndex>
@@ -14,10 +15,13 @@
 #include <QTextEdit>
 #include <QCompleter>
 
-class Connection
+class Connection : public QObject
 {
+    Q_OBJECT
+
 private:
     uint lastQueryTime = 0;
+    ConnectionInfo* connectionInfo = NULL;
 
 protected:
     QSqlDatabase database;
@@ -40,8 +44,6 @@ public:
     virtual void init() = 0;
     virtual void loadDatabaseList() = 0;
 
-//    virtual void collectionTableInformations();
-
     void setDatabaseListView(QTreeView* databaseListView);
     QTreeView* getDatabaseListView() const;
 
@@ -54,6 +56,9 @@ public:
     void setInformationView(QTextEdit* informationView);
     QTextEdit* getInformationView() const;
 
+    void setConnectionInfo(ConnectionInfo* connectionInfo);
+    ConnectionInfo* getConnectionInfo() const;
+
     QString generateLastExecutedQuery(const QSqlQuery& query);
 
     QSqlError lastError();
@@ -63,7 +68,7 @@ public:
     QSqlQuery sendQuery(QSqlQuery query);
     QSqlQuery sendQuery(QString queryString);
 
-//public slots:
+public slots:
     virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
 };
 

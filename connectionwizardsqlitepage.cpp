@@ -16,7 +16,7 @@ ConnectionWizardSqlitePage::ConnectionWizardSqlitePage(QWidget* parent)
 //    setPixmap(QWizard::BackgroundPixmap, QPixmap(":/logos/sqlite.png"));
     setPixmap(QWizard::WatermarkPixmap, QPixmap(":/logos/sqlite_small.png"));
 
-    database = QSqlDatabase::addDatabase("QSQLITE");
+    database = QSqlDatabase::addDatabase("QSQLITE", "sqlite");
 
     QLabel* nameLabel = new QLabel(tr("Name:"));
     nameEdit = new QLineEdit;

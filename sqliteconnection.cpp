@@ -7,20 +7,16 @@
 
 #include <QDebug>
 
-SqliteConnection::SqliteConnection() {
-
-}
-
 void SqliteConnection::init() {
+    QSqlDatabase::removeDatabase("sqlite");
     database = QSqlDatabase::addDatabase("QSQLITE", "sqlite");
-    database.setDatabaseName(this->getDatabasePath());
-    QFileInfo fileInfo(this->getDatabasePath());
+    database.setDatabaseName(this->getConnectionInfo()->getDatabasePath());
+    QFileInfo fileInfo(this->getConnectionInfo()->getDatabasePath());
     activeDatabaseName = fileInfo.baseName();
 }
 
 void SqliteConnection::loadDatabaseList() {
     database.open();
-    qDebug() << "SqliteConnection::loadDatabaseList";
     databaseCollection = new QStandardItemModel(1, 1);
 
     QStandardItem* item = new QStandardItem(activeDatabaseName);
@@ -39,6 +35,8 @@ void SqliteConnection::loadDatabaseList() {
     getQueryRequestView()->setCompleter(completer);
 
     loadTablesList();
+
+    connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
 }
 
 void SqliteConnection::loadTablesList() {
@@ -48,7 +46,6 @@ void SqliteConnection::loadTablesList() {
     if (query.isActive()) {
         emit databaseCollection->layoutAboutToBeChanged();
         databaseCollection->item(0, 0)->removeRows(0, databaseCollection->item(0)->rowCount());
-        qDebug() << "Gefundene Tabellen: " << query.size();
         while (query.next()) {
             QString tableName = query.value(0).toString();
             QStandardItem* item = new QStandardItem(tableName);
@@ -58,8 +55,8 @@ void SqliteConnection::loadTablesList() {
         }
         emit databaseCollection->layoutChanged();
     } else {
-        qDebug() << "Problem Show Databases!";
-        qDebug() << database.lastError();
+        qWarning() << "Problem Show Databases!";
+        qWarning() << database.lastError();
     }
 }
 
@@ -69,28 +66,16 @@ void SqliteConnection::handleTableClicked(QModelIndex index) {
     QStandardItem* item = databaseCollection->itemFromIndex(index);
     activeTableName = item->text();
 
-    // make sure between multiple databases, the correct database to clicked table is connected
-//    switchDatabase(activeDatabase);
-
-    qDebug() << "************* TABLE " << activeTableName << " clicked!";
-//    qDebug() << "datenbank name:" << activeDatabase;
-
     delete queryResultModel;
     queryResultModel = new QStandardItemModel;
 
     QSqlQuery query = sendQuery("SELECT * FROM "+activeTableName);
-
-//    qDebug() << "Time: " << QDateTime::fromMSecsSinceEpoch(timer.elapsed()).toUTC().toString("hh:mm:ss");
 
     if (query.isActive()) {
         QSqlRecord localRecord = query.record();
         for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
             QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
             queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
-//                qDebug() << "FieldName: " << localRecord.fieldName(currentPos);
-//                qDebug() << "Field: " << localRecord.field(currentPos).name();
-//                qDebug() << "Field: " << localRecord.field(currentPos).type();
-//                qDebug() << "Field: " << localRecord.field(currentPos).typeID();
         }
 
         query.seek(-1);
@@ -108,11 +93,9 @@ void SqliteConnection::handleTableClicked(QModelIndex index) {
 
     queryResultView->setModel(queryResultModel);
     queryResultView->resizeColumnsToContents();
-//  statusBar()->showMessage("connected!");
 }
 
 void SqliteConnection::onListViewDoubleClicked(const QModelIndex index) {
-    qDebug() << "DOUBLE CLICK!";
     databaseListView->setItemsExpandable(true);
     QStandardItem* currentItem = databaseCollection->itemFromIndex(index);
 
@@ -123,18 +106,3 @@ void SqliteConnection::onListViewDoubleClicked(const QModelIndex index) {
     handleTableClicked(index);
 }
 
-void SqliteConnection::setDatabaseName(QString databaseName) {
-    this->databaseName = databaseName;
-}
-
-QString SqliteConnection::getDatabaseName() const {
-    return this->databaseName;
-}
-
-void SqliteConnection::setDatabasePath(QString databasePath) {
-    this->databasePath = databasePath;
-}
-
-QString SqliteConnection::getDatabasePath() const {
-    return this->databasePath;
-}
