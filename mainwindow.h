@@ -35,13 +35,14 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    void createToolbars();
     void handleDatabaseClicked(QModelIndex index);
     void handleTableClicked(QStandardItem* item);
     bool switchDatabase(QString databaseName);
     void collectTableInformations();
     void storeConnectionInfo(ConnectionInfo* connectionInfo);
     void createConnectionSubMenu();
+    void saveConnectionInfos();
+    void loadConnectionInfos();
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
     QString generateLastExecutedQuery(const QSqlQuery& query);

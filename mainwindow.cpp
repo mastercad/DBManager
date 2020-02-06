@@ -21,6 +21,9 @@
 #include <QWizard>
 #include <QWizardPage>
 #include <QMenu>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QFile>
 
 #include <QDebug>
 
@@ -46,9 +49,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow::showMaximized();
     connectionFactory = new ConnectionFactory;
     connectionInfoFactory = new ConnectionInfoFactory;
+    connectionInfoFactory->setConnections(&connections);
     setWindowTitle(QString("%1").arg("Database Manager"));
 
     ui->queryResult->setSortingEnabled(true);
+
+    loadConnectionInfos();
+
     connect(ui->btnQueryExecute, SIGNAL(clicked(bool)), this, SLOT(onExecuteQueryClicked()));
     connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(close()));
     connect(ui->actionNewConnection, SIGNAL(triggered(bool)), this, SLOT(openNewConnectionWindow()));
@@ -66,6 +73,7 @@ void MainWindow::openNewConnectionWindow() {
         storeConnectionInfo(connectionInfo);
         dbConnection = establishNewConnection(connectionInfo);
         createConnectionSubMenu();
+        saveConnectionInfos();
     }
 }
 
@@ -84,10 +92,73 @@ void MainWindow::createConnectionSubMenu() {
     }
 }
 
-void MainWindow::storeConnectionInfo(ConnectionInfo* connectionInfo) {
-    if (!connections.contains(connectionInfo->getConnectionType())) {
+void MainWindow::saveConnectionInfos() {
+    QFile file("DBManager.xml");
+    file.open(QFile::ReadWrite);
+    // delete all current content of file.
+    file.resize(0);
+
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("connections");
+    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
+
+    while (typeIterator.hasNext()) {
+        typeIterator.next();
+        QMapIterator<QString, ConnectionInfo*> connectionsIterator(typeIterator.value());
+        while(connectionsIterator.hasNext()) {
+            connectionsIterator.next();
+            stream.writeStartElement("connection");
+//            stream.writeAttribute("href", "url");
+            if (!connectionsIterator.value()->getConnectionName().isEmpty()) {
+                stream.writeTextElement("name", connectionsIterator.value()->getConnectionName());
+            }
+            stream.writeTextElement("type", connectionsIterator.value()->getConnectionType());
+            if ("MYSQL" == connectionsIterator.value()->getConnectionType()) {
+                stream.writeTextElement("host", connectionsIterator.value()->getHost());
+                stream.writeTextElement("port", QString::number(connectionsIterator.value()->getPort()));
+                stream.writeTextElement("user", connectionsIterator.value()->getUser());
+                stream.writeTextElement("password", connectionsIterator.value()->getPassword());
+            } else if ("SQLITE" == connectionsIterator.value()->getConnectionType()) {
+                stream.writeTextElement("databasePath", connectionsIterator.value()->getDatabasePath());
+            }
+            stream.writeEndElement();
+        }
     }
+    stream.writeEndElement();
+    stream.writeEndDocument();
+    file.close();
+}
+
+void MainWindow::loadConnectionInfos() {
+    QFile file("DBManager.xml");
+    file.open(QFile::ReadOnly | QFile::Text);
+    QXmlStreamReader stream(&file);
+    connections.clear();
+    while(!stream.atEnd()
+        && !stream.hasError()
+    ) {
+//        while (stream.readNextStartElement()) {
+//            qDebug() << stream.name();
+//        }
+        QXmlStreamReader::TokenType token = stream.readNext();
+        if (QXmlStreamReader::StartElement == token
+            && "connection" == stream.name()
+        ) {
+            ConnectionInfo* connectionInfo = connectionInfoFactory->create(stream);
+            connections[connectionInfo->getConnectionType()][connectionInfo->getConnectionName()] = connectionInfo;
+        }
+    }
+    createConnectionSubMenu();
+    file.close();
+}
+
+void MainWindow::storeConnectionInfo(ConnectionInfo* connectionInfo) {
     QMap<QString, ConnectionInfo*>connectionInfos;
+    if (connections.contains(connectionInfo->getConnectionType())) {
+        connectionInfos = connections[connectionInfo->getConnectionType()];
+    }
     connectionInfos[connectionInfo->getConnectionName()] = connectionInfo;
     connections[connectionInfo->getConnectionType()] = connectionInfos;
     connectionsSaved = false;
@@ -109,6 +180,12 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection->setQueryRequestView(ui->queryRequest);
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
+
+    if ("SQLITE" == connectionInfo->getConnectionType()) {
+        setWindowTitle(QString("%1 - %2").arg(connectionInfo->getDatabaseName()).arg("Database Manager"));
+    } else {
+        setWindowTitle(QString("%1@%2 - %3").arg(connectionInfo->getUser()).arg(connectionInfo->getHost()).arg("Database Manager"));
+    }
 
     return dbConnection;
 }
@@ -145,31 +222,6 @@ void MainWindow::onExecuteQueryClicked() {
 
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {
 
-}
-
-void MainWindow::createToolbars() {
-//    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    QToolBar *fileToolBar = addToolBar(tr("File"));
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-    QAction *newAct = new QAction(newIcon, tr("&New"), this);
-    newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new file"));
-//    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-//    fileMenu->addAction(newAct);
-    fileToolBar->addAction(newAct);
-
-    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
-    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an existing file"));
-//    connect(openAct, &QAction::triggered, this, &MainWindow::open);
-//    fileMenu->addAction(openAct);
-    fileToolBar->addAction(openAct);
-
-//    QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-    //aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-
-    statusBar()->showMessage(tr("Ready"));
 }
 
 MainWindow::~MainWindow() {
