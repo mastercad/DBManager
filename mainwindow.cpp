@@ -62,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionEditConnection, SIGNAL(triggered(bool)), this, SLOT(openConnectionManagerWindow()));
     connect(ui->actionNewConnection, SIGNAL(triggered(bool)), this, SLOT(openNewConnectionWindow()));
     connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
+    connect(&this->connections, SIGNAL(changed()), this, SLOT(createConnectionSubMenu()));
+    connect(&this->connections, SIGNAL(changed()), this, SLOT(saveConnectionInfos()));
 }
 
 void MainWindow::openNewConnectionWindow() {
@@ -74,7 +76,7 @@ void MainWindow::openNewConnectionWindow() {
         connectionInfo = connectionInfoFactory->create(wizard);
         storeConnectionInfo(connectionInfo);
         dbConnection = establishNewConnection(connectionInfo);
-        createConnectionSubMenu();
+//        createConnectionSubMenu();
         saveConnectionInfos();
     }
 }
@@ -88,16 +90,20 @@ void MainWindow::openConnectionManagerWindow() {
 
 void MainWindow::createConnectionSubMenu() {
     ui->menuVerbinden->clear();
-    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
-    while (typeIterator.hasNext()) {
-        typeIterator.next();
+//    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
+    QMap<QString, QMap<QString, ConnectionInfo*>>::iterator typeIterator = connections.begin();
+
+//    while (typeIterator.hasNext()) {
+    while(typeIterator != connections.end()) {
+//        typeIterator.next();
         QMenu* typeMenu = new QMenu(typeIterator.key());
         QMapIterator<QString, ConnectionInfo*> connectionsIterator(typeIterator.value());
         while(connectionsIterator.hasNext()) {
             connectionsIterator.next();
-            typeMenu->addAction(connectionsIterator.key());
+            typeMenu->addAction(connectionsIterator.value()->getConnectionName());
         }
         ui->menuVerbinden->addMenu(typeMenu);
+        ++typeIterator;
     }
 }
 
@@ -111,10 +117,12 @@ void MainWindow::saveConnectionInfos() {
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("connections");
-    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
+//    QMapIterator<QString, QMap<QString, ConnectionInfo*> > typeIterator(connections);
+    QMap<QString, QMap<QString, ConnectionInfo*>>::iterator typeIterator = connections.begin();
 
-    while (typeIterator.hasNext()) {
-        typeIterator.next();
+//    while (typeIterator.hasNext()) {
+    while(typeIterator != connections.end()) {
+//        typeIterator.next();
         QMapIterator<QString, ConnectionInfo*> connectionsIterator(typeIterator.value());
         while(connectionsIterator.hasNext()) {
             connectionsIterator.next();
@@ -140,6 +148,7 @@ void MainWindow::saveConnectionInfos() {
             }
             stream.writeEndElement();
         }
+        ++typeIterator;
     }
     stream.writeEndElement();
     stream.writeEndDocument();
@@ -151,6 +160,7 @@ void MainWindow::loadConnectionInfos() {
     file.open(QFile::ReadOnly | QFile::Text);
     QXmlStreamReader stream(&file);
     connections.clear();
+
     while(!stream.atEnd()
         && !stream.hasError()
     ) {
@@ -159,21 +169,27 @@ void MainWindow::loadConnectionInfos() {
             && "connection" == stream.name()
         ) {
             ConnectionInfo* connectionInfo = connectionInfoFactory->create(stream);
-            connections[connectionInfo->getConnectionType()][connectionInfo->getConnectionName()] = connectionInfo;
+            connections.insert(connectionInfo);
+//            connections[connectionInfo->getConnectionType()][connectionInfo->getConnectionName()] = connectionInfo;
         }
     }
     createConnectionSubMenu();
     file.close();
+
+    emit connections.changed();
 }
 
 void MainWindow::storeConnectionInfo(ConnectionInfo* connectionInfo) {
-    QMap<QString, ConnectionInfo*>connectionInfos;
-    if (connections.contains(connectionInfo->getConnectionType())) {
-        connectionInfos = connections[connectionInfo->getConnectionType()];
-    }
-    connectionInfos[connectionInfo->getConnectionName()] = connectionInfo;
-    connections[connectionInfo->getConnectionType()] = connectionInfos;
+//    QMap<QString, ConnectionInfo*>connectionInfos;
+//    if (connections.contains(connectionInfo->getConnectionType())) {
+//        connectionInfos = connections[connectionInfo->getConnectionType()];
+//    }
+//    connectionInfos[connectionInfo->getConnectionName()] = connectionInfo;
+//    connections[connectionInfo->getConnectionType()] = connectionInfos;
+    connections.insert(connectionInfo);
     connectionsSaved = false;
+
+    emit connections.changed();
 }
 
 void MainWindow::onEstablishNewConnection(QAction *action) {

@@ -136,10 +136,12 @@ QString ConnectionInfoFactory::generateNewConnectionName(ConnectionInfo* connect
     return connectionName;
 }
 
-void ConnectionInfoFactory::setConnections(QMap<QString, QMap<QString, ConnectionInfo *> >* connections) {
+//void ConnectionInfoFactory::setConnections(QMap<QString, QMap<QString, ConnectionInfo *> >* connections) {
+void ConnectionInfoFactory::setConnections(Connections* connections) {
     this->connections = connections;
 }
 
-QMap<QString, QMap<QString, ConnectionInfo*> >* ConnectionInfoFactory::getConnections() const {
+//QMap<QString, QMap<QString, ConnectionInfo*> >* ConnectionInfoFactory::getConnections() const {
+Connections* ConnectionInfoFactory::getConnections() const {
     return this->connections;
 }

@@ -2,6 +2,7 @@
 #define SQLITECONNECTIONEDITWIDGET_H
 
 #include "connectioninfo.h"
+#include "connections.h"
 #include "mainwindow.h"
 
 #include <QWidget>
@@ -15,7 +16,7 @@ class SqliteConnectionEditWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SqliteConnectionEditWidget(MainWindow *parent = 0);
+    explicit SqliteConnectionEditWidget(MainWindow *parent = 0, Connections* connections = nullptr);
     ~SqliteConnectionEditWidget();
 
     void parseConnectionInfo(ConnectionInfo *connectionInfo);
@@ -28,6 +29,7 @@ private:
     Ui::SqliteConnectionEditWidget *ui;
     MainWindow* parent = NULL;
     ConnectionInfo* currentConnectionInfo = NULL;
+    Connections* connections = NULL;
 
 };
 

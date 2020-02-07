@@ -13,7 +13,8 @@
 
 #include <QDebug>
 
-ConnectionManager::ConnectionManager(MainWindow *parent, QMap<QString, QMap<QString, ConnectionInfo*> >* connections) :
+//ConnectionManager::ConnectionManager(MainWindow *parent, QMap<QString, QMap<QString, ConnectionInfo*> >* connections) :
+ConnectionManager::ConnectionManager(MainWindow *parent, Connections* connections) :
     QDialog(parent),
     ui(new Ui::ConnectionManager),
     parent(parent),
@@ -26,6 +27,8 @@ ConnectionManager::ConnectionManager(MainWindow *parent, QMap<QString, QMap<QStr
     connect(ui->btnNew, SIGNAL(clicked(bool)), parent, SLOT(openNewConnectionWindow()));
     connect(ui->btnSave, SIGNAL(clicked(bool)), this, SLOT(onSaveConnectionsClicked()));
     connect(ui->btnCancel, SIGNAL(clicked(bool)), this, SLOT(close()));
+    connect(this->connections, SIGNAL(changed()), this, SLOT(loadConnections()));
+//    connect(this->connections, SIGNAL(changed()), this, SLOT(disableSaveButton())); macht glaube keinen sinn, da das changed event durch save im widget ausgelöst wird.
 }
 
 void ConnectionManager::loadConnections() {
@@ -56,6 +59,7 @@ void ConnectionManager::loadConnections() {
     }
 
     connect(this->ui->connectionsTreeView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onConnectionDoubleClicked(const QModelIndex)));
+    this->ui->connectionsTreeView->header()->hide();
     this->ui->connectionsTreeView->setModel(model);
 }
 
@@ -75,8 +79,9 @@ void ConnectionManager::onConnectionDoubleClicked(const QModelIndex &index) {
 }
 
 void ConnectionManager::showConnectionEditForMysql() {
-    MysqlConnectionEditWidget* editWidget = new MysqlConnectionEditWidget(parent);
+    MysqlConnectionEditWidget* editWidget = new MysqlConnectionEditWidget(parent, connections);
     delete lastEditWidget;
+//    this->ui->btnSave->setDisabled(true);
     this->ui->mainContainer->addWidget(editWidget);
     editWidget->parseConnectionInfo(currentConnectionInfo);
     lastEditWidget = editWidget;
@@ -84,8 +89,9 @@ void ConnectionManager::showConnectionEditForMysql() {
 }
 
 void ConnectionManager::showConnectionEditForSqlite() {
-    SqliteConnectionEditWidget* editWidget = new SqliteConnectionEditWidget(parent);
+    SqliteConnectionEditWidget* editWidget = new SqliteConnectionEditWidget(parent, connections);
     delete lastEditWidget;
+//    this->ui->btnSave->setDisabled(true);
     this->ui->mainContainer->addWidget(editWidget);
     editWidget->parseConnectionInfo(currentConnectionInfo);
     lastEditWidget = editWidget;

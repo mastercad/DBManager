@@ -4,6 +4,7 @@
 #include "newconnectionwindow.h"
 #include "connectionfactory.h"
 #include "connection.h"
+#include "connections.h"
 #include "connectioninfofactory.h"
 #include "connectioninfo.h"
 
@@ -33,6 +34,8 @@ public slots:
     void onEstablishNewConnection(QAction* action);
     void onQueryResultHeaderClicked(QStandardItem* item);
     void onExecuteQueryClicked();
+    void createConnectionSubMenu();
+    void saveConnectionInfos();
 
 private:
     Ui::MainWindow *ui;
@@ -41,8 +44,6 @@ private:
     bool switchDatabase(QString databaseName);
     void collectTableInformations();
     void storeConnectionInfo(ConnectionInfo* connectionInfo);
-    void createConnectionSubMenu();
-    void saveConnectionInfos();
     void loadConnectionInfos();
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
@@ -60,7 +61,8 @@ private:
     ConnectionFactory* connectionFactory = NULL;
     ConnectionInfoFactory* connectionInfoFactory = NULL;
 
-    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
+//    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
+    Connections connections;
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = NULL;

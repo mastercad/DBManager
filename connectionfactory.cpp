@@ -3,6 +3,8 @@
 #include "mysqlconnection.h"
 #include "sqliteconnection.h"
 
+#include <QDebug>
+
 Connection* ConnectionFactory::create(ConnectionInfo* connectionInfo) {
     // MYSQL Connection
     if ("MYSQL" == connectionInfo->getConnectionType()) {

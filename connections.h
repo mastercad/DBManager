@@ -5,20 +5,34 @@
 
 #include <QMap>
 #include <QString>
+#include <QObject>
 
-class Connections
+#include <QDebug>
+
+class Connections : public QObject
 {
+    Q_OBJECT
+
 public:
-    Connections();
-    void insertConnection(QString&, QString&, ConnectionInfo*);
-    void deleteConnection(ConnectionInfo*);
-    void replaceConnection(ConnectionInfo*);
+    void insert(ConnectionInfo*);
+    void remove(ConnectionInfo*);
+    void clear();
+    bool contains(const QString&);
+    void replace(ConnectionInfo*, ConnectionInfo*);
+    int size() const;
+
+    QMap<QString, QMap<QString, ConnectionInfo*>>::iterator begin();
+    QMap<QString, QMap<QString, ConnectionInfo*>>::iterator end();
+
+    QMap<QString, ConnectionInfo*> operator [] (QString connectionType) {
+        return connections.value(connectionType);
+    }
 
 signals:
     void changed();
 
 private:
-    QMap<QString, QMap<QString, ConnectionInfo*> >* connections;
+    QMap<QString, QMap<QString, ConnectionInfo*>> connections;
 };
 
 #endif // CONNECTIONS_H
