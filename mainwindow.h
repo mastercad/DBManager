@@ -29,6 +29,7 @@ public:
 
 public slots:
     void openNewConnectionWindow();
+    void openConnectionManagerWindow();
     void onEstablishNewConnection(QAction* action);
     void onQueryResultHeaderClicked(QStandardItem* item);
     void onExecuteQueryClicked();

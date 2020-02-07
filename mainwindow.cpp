@@ -3,6 +3,7 @@
 
 #include "textedit.h"
 #include "newconnectionwizard.h"
+#include "connectionmanager.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -58,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->btnQueryExecute, SIGNAL(clicked(bool)), this, SLOT(onExecuteQueryClicked()));
     connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(close()));
+    connect(ui->actionEditConnection, SIGNAL(triggered(bool)), this, SLOT(openConnectionManagerWindow()));
     connect(ui->actionNewConnection, SIGNAL(triggered(bool)), this, SLOT(openNewConnectionWindow()));
     connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
 }
@@ -74,6 +76,13 @@ void MainWindow::openNewConnectionWindow() {
         dbConnection = establishNewConnection(connectionInfo);
         createConnectionSubMenu();
         saveConnectionInfos();
+    }
+}
+
+void MainWindow::openConnectionManagerWindow() {
+    ConnectionManager manager(this, &connections);
+    if (manager.exec()) {
+        qDebug() << "Manager Open!";
     }
 }
 

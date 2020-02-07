@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SqliteConnectionEditWidget</class>
+ <widget class="QWidget" name="SqliteConnectionEditWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>490</width>
+    <height>221</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,6">
+     <item>
+      <widget class="QLabel" name="connectionNameLabel">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="connectionNameEdit">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>New Connection</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,5,1">
+     <item>
+      <widget class="QLabel" name="databasePathLabel">
+       <property name="text">
+        <string>Database</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="databasePathEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="openFileDialog">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

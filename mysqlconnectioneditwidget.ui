@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MysqlConnectionEditWidget</class>
+ <widget class="QWidget" name="MysqlConnectionEditWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>489</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,6">
+       <item>
+        <widget class="QLabel" name="connectionNameLabel">
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="connectionNameEdit">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="placeholderText">
+          <string>New Connection</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,4,1,1">
+       <item>
+        <widget class="QLabel" name="hostLabel">
+         <property name="text">
+          <string>Host</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="hostEdit">
+         <property name="placeholderText">
+          <string>localhost</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="portLabel">
+         <property name="text">
+          <string>Port</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="portEdit">
+         <property name="placeholderText">
+          <string>3306</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,6">
+       <item>
+        <widget class="QLabel" name="userLabel">
+         <property name="text">
+          <string>User</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="userEdit">
+         <property name="placeholderText">
+          <string>root</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="2,6">
+       <item>
+        <widget class="QLabel" name="passwordLabel">
+         <property name="text">
+          <string>Password</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="passwordEdit">
+         <property name="echoMode">
+          <enum>QLineEdit::Password</enum>
+         </property>
+         <property name="placeholderText">
+          <string>root</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,6">
+       <item>
+        <widget class="QLabel" name="databaseLabel">
+         <property name="text">
+          <string>Database</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="databaseEdit"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QPushButton" name="btnTestConnection">
+         <property name="text">
+          <string>Test Connection</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -47,7 +47,11 @@ SOURCES += \
     connectioninfo.cpp \
     mysqlconnectioninfo.cpp \
     sqliteconnectioninfo.cpp \
-    connectioninfofactory.cpp
+    connectioninfofactory.cpp \
+    connectionmanager.cpp \
+    mysqlconnectioneditwidget.cpp \
+    sqliteconnectioneditwidget.cpp \
+    connections.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -67,13 +71,20 @@ HEADERS += \
     connectioninfo.h \
     mysqlconnectioninfo.h \
     sqliteconnectioninfo.h \
-    connectioninfofactory.h
+    connectioninfofactory.h \
+    connectionmanager.h \
+    mysqlconnectioneditwidget.h \
+    sqliteconnectioneditwidget.h \
+    connections.h
 
 FORMS += \
     mainwindow.ui \
     newconnectionwindow.ui \
     connectionwithlogindialog.ui \
-    connectionwithfiledialog.ui
+    connectionwithfiledialog.ui \
+    connectionmanager.ui \
+    mysqlconnectioneditwidget.ui \
+    sqliteconnectioneditwidget.ui
 
 DISTFILES += \
     README.md \
