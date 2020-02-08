@@ -99,9 +99,7 @@ ConnectionInfo* ConnectionInfoFactory::create(ConnectionWizardMysqlPage* wizardP
     connectionInfo->setPassword(wizardPage->getPasswordEdit()->text());
     connectionInfo->setDatabaseName(wizardPage->getDatabaseEdit()->text());
     connectionInfo->setConnectionType("MYSQL");
-    qDebug() << "Generate Connection Name!";
     connectionInfo->setConnectionName(!wizardPage->getNameEdit()->text().isEmpty() ? wizardPage->getNameEdit()->text() : generateNewConnectionName(connectionInfo));
-    qDebug() << "Finish generate Connection Name!";
 
     return connectionInfo;
 }
@@ -116,7 +114,6 @@ QString ConnectionInfoFactory::generateNewConnectionName(ConnectionInfo* connect
     if (nullptr == connections) {
         return connectionName;
     }
-    qDebug() << "Habe connections!";
 
     QMap<QString, QMap<QString, ConnectionInfo*> >::iterator typeIterator = connections->begin();
 

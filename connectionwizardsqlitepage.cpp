@@ -71,7 +71,6 @@ bool ConnectionWizardSqlitePage::validatePage() {
         setField("sqlite.connection.valid", "YES");
         return true;
     }
-    qDebug() << "CLOSED!";
     wizard()->button(QWizard::NextButton)->setEnabled(false);
     wizard()->button(QWizard::FinishButton)->setEnabled(false);
     setField("sqlite.connection.valid", "NO");

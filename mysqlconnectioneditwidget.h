@@ -27,6 +27,7 @@ public:
 public slots:
     void save();
     bool testConnection();
+    void deactivateSaveBtn(const QString &);
 
 private:
     ConnectionInfo* generateConnectionInfo();

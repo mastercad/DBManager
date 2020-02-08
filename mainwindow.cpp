@@ -72,7 +72,6 @@ void MainWindow::openNewConnectionWindow() {
         connectionInfo = connectionInfoFactory->create(wizard);
         storeConnectionInfo(connectionInfo);
         dbConnection = establishNewConnection(connectionInfo);
-//        createConnectionSubMenu();
         saveConnectionInfos();
     }
 }
@@ -224,7 +223,6 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
 }
 
 void MainWindow::handleConnectionError(QString errorMessage) {
-    qDebug() << "Habe ERROR! " << errorMessage;
     this->ui->information->append(errorMessage);
 }
 

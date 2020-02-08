@@ -66,8 +66,7 @@ void ConnectionManager::loadConnections() {
 }
 
 void ConnectionManager::onValidationState(bool state) {
-    qDebug() << "Set Save btn to disabled? " << state;
-    this->ui->btnSave->setDisabled(!state);
+    this->ui->btnSave->setDisabled(state);
 }
 
 void ConnectionManager::onConnectionDoubleClicked(const QModelIndex &index) {
