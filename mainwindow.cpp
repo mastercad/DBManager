@@ -228,6 +228,11 @@ void MainWindow::handleConnectionError(QString errorMessage) {
 
 void MainWindow::onExecuteQueryClicked() {
     QString queryString = ui->queryRequest->toPlainText();
+
+    if (nullptr == dbConnection) {
+        this->ui->information->append("No Connection established!");
+        return;
+    }
     QSqlQuery query = dbConnection->sendQuery(queryString);
 
     QStandardItemModel* queryResultModel = new QStandardItemModel;
