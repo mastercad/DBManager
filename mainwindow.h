@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 public slots:
@@ -36,6 +36,7 @@ public slots:
     void onExecuteQueryClicked();
     void createConnectionSubMenu();
     void saveConnectionInfos();
+    void handleConnectionError(QString errorMessage);
 
 private:
     Ui::MainWindow *ui;
@@ -51,21 +52,21 @@ private:
     QSqlQuery sendQuery(QSqlQuery query);
     QSqlQuery sendQuery(QString queryString);
 
-    NewConnectionWindow* newConnectionWindow = NULL;
-    Connection* dbConnection = NULL;
-    ConnectionInfo* connectionInfo= NULL;
+    NewConnectionWindow* newConnectionWindow = nullptr;
+    Connection* dbConnection = nullptr;
+    ConnectionInfo* connectionInfo= nullptr;
 
     QString activeDatabase;
     QString activeTable;
 
-    ConnectionFactory* connectionFactory = NULL;
-    ConnectionInfoFactory* connectionInfoFactory = NULL;
+    ConnectionFactory* connectionFactory = nullptr;
+    ConnectionInfoFactory* connectionInfoFactory = nullptr;
 
 //    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
     Connections connections;
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
-    QCompleter* completer = NULL;
+    QCompleter* completer = nullptr;
     bool connectionsSaved = true;
 };
 

@@ -20,27 +20,31 @@ class ConnectionManager : public QDialog
     Q_OBJECT
 
 public:
-//    explicit ConnectionManager(MainWindow *parent = 0, QMap<QString, QMap<QString, ConnectionInfo* > >* connections = nullptr);
-    explicit ConnectionManager(MainWindow *parent = 0, Connections* connections = nullptr);
+//    explicit ConnectionManager(MainWindow *parent = nullptr, QMap<QString, QMap<QString, ConnectionInfo* > >* connections = nullptr);
+    explicit ConnectionManager(MainWindow *parent = nullptr, Connections* connections = nullptr);
     ~ConnectionManager();
 
 public slots:
     void onSaveConnectionsClicked();
     void loadConnections();
     void onConnectionDoubleClicked(const QModelIndex &index);
+    void onValidationState(bool);
+
+signals:
+    void invalid(bool);
 
 private:
     void showConnectionEdit(QStandardItem* currentItem);
     void showConnectionEditForMysql();
     void showConnectionEditForSqlite();
 
-    QStandardItemModel* model = NULL;
-    ConnectionInfo* currentConnectionInfo = NULL;
-    QWidget* lastEditWidget = NULL;
+    QStandardItemModel* model = nullptr;
+    ConnectionInfo* currentConnectionInfo = nullptr;
+    QWidget* lastEditWidget = nullptr;
     Ui::ConnectionManager *ui;
     MainWindow* parent;
 //    QMap<QString, QMap<QString, ConnectionInfo *> >* connections = NULL;
-    Connections* connections = NULL;
+    Connections* connections = nullptr;
 };
 
 #endif // CONNECTIONMANAGER_H

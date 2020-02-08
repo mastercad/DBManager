@@ -14,8 +14,6 @@ private:
     void handleTableClicked(QStandardItem* item);
     void handleDatabaseClicked(QModelIndex index);
 
-    QStandardItemModel* databaseCollection = NULL;
-
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
 

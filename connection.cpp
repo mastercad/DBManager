@@ -5,11 +5,6 @@
 
 #include <QDebug>
 
-Connection::Connection()
-{
-
-}
-
 QSqlQuery Connection::sendQuery(QSqlQuery query) {
     QElapsedTimer timer;
     timer.start();
@@ -124,6 +119,10 @@ void Connection::close() {
 
 bool Connection::open() {
     return database.open();
+}
+
+bool Connection::isOpen() {
+    return database.isOpen();
 }
 
 Connection::~Connection() {

@@ -3,7 +3,7 @@
 
 #include <QFileDialog>
 
-SqliteConnectionEditWidget::SqliteConnectionEditWidget(MainWindow *parent, Connections* connections) :
+SqliteConnectionEditWidget::SqliteConnectionEditWidget(ConnectionManager *parent, Connections* connections) :
     QWidget(parent),
     ui(new Ui::SqliteConnectionEditWidget),
     parent(parent),

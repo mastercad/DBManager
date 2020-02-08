@@ -48,11 +48,11 @@ QString ConnectionInfo::getPassword() const {
     return this->password;
 }
 
-void ConnectionInfo::setPort(uint port) {
+void ConnectionInfo::setPort(int port) {
     this->port = port;
 }
 
-uint ConnectionInfo::getPort() const {
+int ConnectionInfo::getPort() const {
     return this->port;
 }
 

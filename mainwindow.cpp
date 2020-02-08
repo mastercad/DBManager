@@ -28,15 +28,11 @@
 
 #include <QDebug>
 
+#include "defaults.h"
+
 // Driver not loaded
 // Access denied for user 'root'@'172.19.0.1' (using password: YES)
 // Unknown database 'retro_board'
-
-QString hostName;
-QString userName;
-QString password;
-QString port;
-QString databaseName;
 
 /**
  * @brief MainWindow::MainWindow
@@ -69,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::openNewConnectionWindow() {
     NewConnectionWizard wizard;
     if (wizard.exec()) {
-        if (NULL != dbConnection) {
+        if (nullptr != dbConnection) {
             dbConnection->close();
         }
 
@@ -135,11 +131,18 @@ void MainWindow::saveConnectionInfos() {
             }
             stream.writeTextElement("type", connectionsIterator.value()->getConnectionType());
             if ("MYSQL" == connectionsIterator.value()->getConnectionType()) {
-                stream.writeTextElement("host", connectionsIterator.value()->getHost());
-                stream.writeTextElement("port", QString::number(connectionsIterator.value()->getPort()));
-                stream.writeTextElement("user", connectionsIterator.value()->getUser());
-                stream.writeTextElement("password", connectionsIterator.value()->getPassword());
-
+                if (!connectionsIterator.value()->getHost().isEmpty()) {
+                    stream.writeTextElement("host", connectionsIterator.value()->getHost());
+                }
+                if (0 < connectionsIterator.value()->getPort()) {
+                    stream.writeTextElement("port", QString::number(connectionsIterator.value()->getPort()));
+                }
+                if (!connectionsIterator.value()->getUser().isEmpty()) {
+                    stream.writeTextElement("user", connectionsIterator.value()->getUser());
+                }
+                if (!connectionsIterator.value()->getPassword().isEmpty()) {
+                    stream.writeTextElement("password", connectionsIterator.value()->getPassword());
+                }
                 if (!connectionsIterator.value()->getDatabaseName().isEmpty()) {
                     stream.writeTextElement("database", connectionsIterator.value()->getDatabaseName());
                 }
@@ -203,6 +206,8 @@ void MainWindow::onEstablishNewConnection(QAction *action) {
 
 Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection = connectionFactory->create(connectionInfo);
+    connect(dbConnection, SIGNAL(connectionError(QString)), this, SLOT(handleConnectionError(QString)));
+
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
     dbConnection->setQueryRequestView(ui->queryRequest);
@@ -216,6 +221,11 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     }
 
     return dbConnection;
+}
+
+void MainWindow::handleConnectionError(QString errorMessage) {
+    qDebug() << "Habe ERROR! " << errorMessage;
+    this->ui->information->append(errorMessage);
 }
 
 void MainWindow::onExecuteQueryClicked() {

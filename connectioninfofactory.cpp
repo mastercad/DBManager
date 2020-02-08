@@ -12,16 +12,10 @@
 ConnectionInfo* ConnectionInfoFactory::create(QXmlStreamReader& stream) {
     ConnectionInfo* connectionInfo = new ConnectionInfo();
 
-    connectionInfo->setHost("localhost");
-    connectionInfo->setPort(3306);
-    connectionInfo->setUser("root");
-    connectionInfo->setPassword("root");
-
     if(stream.tokenType() != QXmlStreamReader::StartElement
-        && stream.name() == "connection"
+        && "connection" == stream.name()
     ) {
         qFatal("could not parse connection information!");
-        return connectionInfo;
     }
 
 //    QXmlStreamAttributes attributes = stream.attributes();
@@ -42,37 +36,21 @@ ConnectionInfo* ConnectionInfoFactory::create(QXmlStreamReader& stream) {
             if (QXmlStreamReader::Characters != stream.tokenType()) {
                 continue;
             }
-            if ("name" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            if ("name" == elementName) {
                 connectionInfo->setConnectionName(stream.text().toString());
-            } else if ("type" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("type" == elementName) {
                 connectionInfo->setConnectionType(stream.text().toString());
-            } else if ("host" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("host" == elementName) {
                 connectionInfo->setHost(stream.text().toString());
-            } else if ("port" == elementName
-                && 0 < stream.text().toUInt()
-            ) {
-                connectionInfo->setPort(stream.text().toUInt());
-            } else if ("user" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("port" == elementName) {
+                connectionInfo->setPort(stream.text().toInt());
+            } else if ("user" == elementName) {
                 connectionInfo->setUser(stream.text().toString());
-            } else if ("password" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("password" == elementName) {
                 connectionInfo->setPassword(stream.text().toString());
-            } else if ("databasePath" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("databasePath" == elementName) {
                 connectionInfo->setDatabasePath(stream.text().toString());
-            } else if ("database" == elementName
-                && !stream.text().toString().isEmpty()
-            ) {
+            } else if ("database" == elementName) {
                 connectionInfo->setDatabaseName(stream.text().toString());
             }
         }
@@ -90,10 +68,10 @@ ConnectionInfo* ConnectionInfoFactory::create(NewConnectionWizard& wizard) {
     if ("YES" == wizard.field("mysql.connection.valid").toString()) {
 //        MysqlConnectionInfo* connectionInfo = new MysqlConnectionInfo();
         ConnectionInfo* connectionInfo = new ConnectionInfo();
-        connectionInfo->setHost(!wizard.field("mysql.host").toString().isEmpty() ? wizard.field("mysql.host").toString() : "localhost");
-        connectionInfo->setPort(!wizard.field("mysql.port").isNull() && 0 < wizard.field("mysql.port").toInt() ? wizard.field("mysql.port").toInt() : 3306);
-        connectionInfo->setUser(!wizard.field("mysql.user").toString().isEmpty() ? wizard.field("mysql.user").toString() : "root");
-        connectionInfo->setPassword(!wizard.field("mysql.password").toString().isEmpty() ? wizard.field("mysql.password").toString() : "root");
+        connectionInfo->setHost(wizard.field("mysql.host").toString());
+        connectionInfo->setPort(wizard.field("mysql.port").toInt());
+        connectionInfo->setUser(wizard.field("mysql.user").toString());
+        connectionInfo->setPassword(wizard.field("mysql.password").toString());
         connectionInfo->setDatabaseName(wizard.field("mysql.database").toString());
         connectionInfo->setConnectionType("MYSQL");
         connectionInfo->setConnectionName(!wizard.field("mysql.connection.name").toString().isEmpty() ? wizard.field("mysql.connection.name").toString() : generateNewConnectionName(connectionInfo));
@@ -110,6 +88,22 @@ ConnectionInfo* ConnectionInfoFactory::create(NewConnectionWizard& wizard) {
 
         return connectionInfo;
     }
+    return nullptr;
+}
+
+ConnectionInfo* ConnectionInfoFactory::create(ConnectionWizardMysqlPage* wizardPage) {
+    ConnectionInfo* connectionInfo = new ConnectionInfo();
+    connectionInfo->setHost(wizardPage->getHostEdit()->text());
+    connectionInfo->setPort(wizardPage->getPortEdit()->text().toInt());
+    connectionInfo->setUser(wizardPage->getUserEdit()->text());
+    connectionInfo->setPassword(wizardPage->getPasswordEdit()->text());
+    connectionInfo->setDatabaseName(wizardPage->getDatabaseEdit()->text());
+    connectionInfo->setConnectionType("MYSQL");
+    qDebug() << "Generate Connection Name!";
+    connectionInfo->setConnectionName(!wizardPage->getNameEdit()->text().isEmpty() ? wizardPage->getNameEdit()->text() : generateNewConnectionName(connectionInfo));
+    qDebug() << "Finish generate Connection Name!";
+
+    return connectionInfo;
 }
 
 QString ConnectionInfoFactory::generateNewConnectionName(ConnectionInfo* connectionInfo, int currentNumber) {
@@ -118,6 +112,11 @@ QString ConnectionInfoFactory::generateNewConnectionName(ConnectionInfo* connect
     if (0 < currentNumber) {
         connectionName = QString(connectionName + " " + QString::number(currentNumber));
     }
+
+    if (nullptr == connections) {
+        return connectionName;
+    }
+    qDebug() << "Habe connections!";
 
     QMap<QString, QMap<QString, ConnectionInfo*> >::iterator typeIterator = connections->begin();
 

@@ -1,6 +1,7 @@
 #ifndef MYSQLCONNECTIONEDITWIDGET_H
 #define MYSQLCONNECTIONEDITWIDGET_H
 
+#include "connectionmanager.h"
 #include "connectioninfo.h"
 #include "connections.h"
 
@@ -17,21 +18,24 @@ class MysqlConnectionEditWidget : public QWidget
     Q_OBJECT
 
 public:
-//    explicit MysqlConnectionEditWidget(QWidget *parent = 0, QMap<QString, QMap<QString, ConnectionInfo*> >* connections = nullptr);
-    explicit MysqlConnectionEditWidget(QWidget *parent = 0, Connections* connections = nullptr);
+//    explicit MysqlConnectionEditWidget(QWidget *parent = nullptr, QMap<QString, QMap<QString, ConnectionInfo*> >* connections = nullptr);
+    explicit MysqlConnectionEditWidget(ConnectionManager *parent = nullptr, Connections* connections = nullptr);
     ~MysqlConnectionEditWidget();
 
     void parseConnectionInfo(ConnectionInfo* connectionInfo);
 
 public slots:
     void save();
+    bool testConnection();
 
 private:
-    QWidget* parent = NULL;
+    ConnectionInfo* generateConnectionInfo();
+
+    ConnectionManager* parent = nullptr;
 //    QMap<QString, QMap<QString, ConnectionInfo*> >* connections = NULL;
-    Connections* connections = NULL;
+    Connections* connections = nullptr;
     Ui::MysqlConnectionEditWidget *ui;
-    ConnectionInfo* currentConnectionInfo = NULL;
+    ConnectionInfo* currentConnectionInfo = nullptr;
 };
 
 #endif // MYSQLCONNECTIONEDITWIDGET_H

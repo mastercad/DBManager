@@ -1,5 +1,10 @@
 #include "connectionwizardmysqlpage.h"
 #include "newconnectionwizard.h"
+#include "connectionfactory.h"
+#include "connection.h"
+#include "connectioninfofactory.h"
+#include "defaults.h"
+#include "mysqlconnectionvalidator.h"
 
 #include <QWizardPage>
 #include <QVBoxLayout>
@@ -32,14 +37,14 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     nameEdit = new QLineEdit;
     nameEdit->setPlaceholderText(tr("Define name for new connection"));
     hostEdit = new QLineEdit;
-    hostEdit->setPlaceholderText(tr("localhost"));
+    hostEdit->setPlaceholderText(Defaults::MYSQL::HOST);
     portEdit = new QLineEdit;
-    portEdit->setPlaceholderText("3306");
+    portEdit->setPlaceholderText(QString::number(Defaults::MYSQL::PORT));
     userEdit = new QLineEdit;
-    userEdit->setPlaceholderText(tr("root"));
+    userEdit->setPlaceholderText(Defaults::MYSQL::USER);
     passwordEdit = new QLineEdit;
     passwordEdit->setEchoMode(QLineEdit::Password);
-    passwordEdit->setPlaceholderText(tr("root"));
+    passwordEdit->setPlaceholderText(Defaults::MYSQL::PASSWORD);
 
     mysqlConnectionValidEdit = new QLineEdit;
     mysqlConnectionValidEdit->setText("NO");
@@ -96,18 +101,14 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
 }
 
 bool ConnectionWizardMysqlPage::validatePage() {
-    database.close();
-    database.setHostName(!hostEdit->text().isEmpty() ? hostEdit->text() : "localhost");
+    ConnectionInfoFactory connectionInfoFactory;
+    ConnectionInfo* connectionInfo = connectionInfoFactory.create(this);
+    ConnectionFactory connectionFactory;
+    Connection* connection = connectionFactory.create(connectionInfo);
+    MysqlConnectionValidator connectionValidator;
+    bool result = false;
 
-    if (!databaseEdit->text().isEmpty()) {
-        database.setDatabaseName(databaseEdit->text());
-    }
-    database.setPort(!portEdit->text().isNull() ? portEdit->text().toUInt() : 3306);
-    database.setUserName(!userEdit->text().isEmpty() ? userEdit->text() : "root");
-    database.setPassword(!passwordEdit->text().isEmpty() ? passwordEdit->text() : "root");
-    database.open();
-
-    if (database.isOpen()) {
+    if (connectionValidator.validate(connection)) {
         wizard()->button(QWizard::NextButton)->setEnabled(true);
         wizard()->button(QWizard::FinishButton)->setEnabled(true);
         mysqlConnectionValidEdit->setText("YES");
@@ -116,16 +117,21 @@ bool ConnectionWizardMysqlPage::validatePage() {
 
 //        setField("mysql.connection.valid", mysqlConnectionValidEdit);
         setField("mysql.connection.valid", "YES");
-        return true;
+        result = true;
+    } else {
+        wizard()->button(QWizard::NextButton)->setEnabled(false);
+        wizard()->button(QWizard::FinishButton)->setEnabled(false);
+        mysqlConnectionValidEdit->setText("NO");
+        informationTextEdit->setText(connection->lastError().databaseText());
+        informationTextEdit->show();
+    //    setField("mysql.connection.valid", mysqlConnectionValidEdit);
+        setField("mysql.connection.valid", "NO");
     }
-    wizard()->button(QWizard::NextButton)->setEnabled(false);
-    wizard()->button(QWizard::FinishButton)->setEnabled(false);
-    mysqlConnectionValidEdit->setText("NO");
-    informationTextEdit->setText(database.lastError().databaseText());
-    informationTextEdit->show();
-//    setField("mysql.connection.valid", mysqlConnectionValidEdit);
-    setField("mysql.connection.valid", "NO");
-    return false;
+
+    delete connectionInfo;
+    delete connection;
+
+    return result;
 }
 
 bool ConnectionWizardMysqlPage::isComplete() const {
@@ -135,4 +141,52 @@ bool ConnectionWizardMysqlPage::isComplete() const {
 int ConnectionWizardMysqlPage::nextId() const {
 //    return NewConnectionWizard::Page_Finish;
     return -1;
+}
+
+void ConnectionWizardMysqlPage::setNameEdit(QLineEdit* const nameEdit){
+    this->nameEdit = nameEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getNameEdit() const {
+    return this->nameEdit;
+}
+
+void ConnectionWizardMysqlPage::setHostEdit(QLineEdit* const hostEdit) {
+    this->hostEdit = hostEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getHostEdit() const {
+    return this->hostEdit;
+}
+
+void ConnectionWizardMysqlPage::setPortEdit(QLineEdit* const portEdit) {
+    this->portEdit = portEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getPortEdit() const {
+    return this->portEdit;
+}
+
+void ConnectionWizardMysqlPage::setUserEdit(QLineEdit* const userEdit) {
+    this->userEdit = userEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getUserEdit() const {
+    return this->userEdit;
+}
+
+void ConnectionWizardMysqlPage::setPasswordEdit(QLineEdit* const passwordEdit) {
+    this->passwordEdit = passwordEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getPasswordEdit() const {
+    return this->passwordEdit;
+}
+
+void ConnectionWizardMysqlPage::setDatabaseEdit(QLineEdit* const databaseEdit) {
+    this->databaseEdit = databaseEdit;
+}
+
+QLineEdit* ConnectionWizardMysqlPage::getDatabaseEdit() const {
+    return this->databaseEdit;
 }

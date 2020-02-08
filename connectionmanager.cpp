@@ -59,15 +59,22 @@ void ConnectionManager::loadConnections() {
     }
 
     connect(this->ui->connectionsTreeView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onConnectionDoubleClicked(const QModelIndex)));
+    connect(this, SIGNAL(invalid(bool)), this, SLOT(onValidationState(bool)));
+
     this->ui->connectionsTreeView->header()->hide();
     this->ui->connectionsTreeView->setModel(model);
+}
+
+void ConnectionManager::onValidationState(bool state) {
+    qDebug() << "Set Save btn to disabled? " << state;
+    this->ui->btnSave->setDisabled(!state);
 }
 
 void ConnectionManager::onConnectionDoubleClicked(const QModelIndex &index) {
     QStandardItem* currentItem = model->itemFromIndex(index);
 
-    if (0 != currentItem
-        && 0 != currentItem->parent()
+    if (nullptr != currentItem
+        && nullptr != currentItem->parent()
     ) {
         currentConnectionInfo = index.data(Qt::UserRole + 1).value<ConnectionInfo*>();
         if ("MYSQL" == currentConnectionInfo->getConnectionType()) {
@@ -79,7 +86,7 @@ void ConnectionManager::onConnectionDoubleClicked(const QModelIndex &index) {
 }
 
 void ConnectionManager::showConnectionEditForMysql() {
-    MysqlConnectionEditWidget* editWidget = new MysqlConnectionEditWidget(parent, connections);
+    MysqlConnectionEditWidget* editWidget = new MysqlConnectionEditWidget(this, connections);
     delete lastEditWidget;
 //    this->ui->btnSave->setDisabled(true);
     this->ui->mainContainer->addWidget(editWidget);
@@ -89,7 +96,7 @@ void ConnectionManager::showConnectionEditForMysql() {
 }
 
 void ConnectionManager::showConnectionEditForSqlite() {
-    SqliteConnectionEditWidget* editWidget = new SqliteConnectionEditWidget(parent, connections);
+    SqliteConnectionEditWidget* editWidget = new SqliteConnectionEditWidget(this, connections);
     delete lastEditWidget;
 //    this->ui->btnSave->setDisabled(true);
     this->ui->mainContainer->addWidget(editWidget);

@@ -15,7 +15,7 @@ private:
     QString host;
     QString user;
     QString password;
-    uint port;
+    int port;
     QString databaseName;
 
 public:
@@ -36,8 +36,8 @@ public:
     void setPassword(QString password);
     QString getPassword() const;
 
-    void setPort(uint port);
-    uint getPort() const;
+    void setPort(int port);
+    int getPort() const;
 
     void setDatabaseName(QString databaseName);
     QString getDatabaseName() const;

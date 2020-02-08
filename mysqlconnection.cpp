@@ -1,5 +1,7 @@
  #include "mysqlconnection.h"
 
+#include "defaults.h"
+
 #include <QStandardItemModel>
 #include <QHeaderView>
 #include <QSqlQuery>
@@ -10,11 +12,15 @@
 #include <QDebug>
 
 void MysqlConnection::init() {
+    if (QSqlDatabase::contains("mysql")) {
+        QSqlDatabase::removeDatabase("mysql");
+    }
     database = QSqlDatabase::addDatabase("QMYSQL", "mysql");
-    database.setHostName(this->getConnectionInfo()->getHost());
-    database.setPort(this->getConnectionInfo()->getPort());
-    database.setUserName(this->getConnectionInfo()->getUser());
-    database.setPassword(this->getConnectionInfo()->getPassword());
+    database.setHostName(this->getConnectionInfo()->getHost().isEmpty() ? Defaults::MYSQL::HOST : this->getConnectionInfo()->getHost());
+    database.setPort(0 >= this->getConnectionInfo()->getPort() ? Defaults::MYSQL::PORT : this->getConnectionInfo()->getPort());
+    database.setUserName(this->getConnectionInfo()->getUser().isEmpty() ? Defaults::MYSQL::USER : this->getConnectionInfo()->getUser());
+    database.setPassword(this->getConnectionInfo()->getPassword().isEmpty() ? Defaults::MYSQL::PASSWORD : this->getConnectionInfo()->getPassword());
+    database.setDatabaseName(this->getConnectionInfo()->getDatabaseName());
 }
 
 void MysqlConnection::loadDatabaseList() {
@@ -25,7 +31,7 @@ void MysqlConnection::loadDatabaseList() {
 
     if (query.isActive()) {
         databaseCollection = new QStandardItemModel(query.size(), 1);
-        unsigned int row = 0;
+        int row = 0;
 
         while (query.next()) {
             QStandardItem* item = new QStandardItem(query.value(0).toString());
@@ -53,8 +59,9 @@ void MysqlConnection::loadDatabaseList() {
 
         connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
     } else {
-        qWarning() << "Problem Show Databases!";
+        qWarning() << "Problem Show Databases!!!!!";
         qWarning() << database.lastError();
+        emit connectionError(database.lastError().text());
     }
 }
 
@@ -62,12 +69,12 @@ void MysqlConnection::onListViewDoubleClicked(const QModelIndex index) {
     databaseListView->setItemsExpandable(true);
     QStandardItem* currentItem = databaseCollection->itemFromIndex(index);
 
-    if (0 == currentItem) {
+    if (nullptr == currentItem) {
         return;
     }
 
     // habe kein parent => ist eine datenbank
-    if (0 == currentItem->parent()) {
+    if (nullptr == currentItem->parent()) {
         handleDatabaseClicked(index);
     } else {
         handleTableClicked(currentItem);

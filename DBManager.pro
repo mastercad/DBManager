@@ -51,7 +51,9 @@ SOURCES += \
     connectionmanager.cpp \
     mysqlconnectioneditwidget.cpp \
     sqliteconnectioneditwidget.cpp \
-    connections.cpp
+    connections.cpp \
+    mysqlconnectionvalidator.cpp \
+    sqliteconnectionvalidator.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -75,7 +77,9 @@ HEADERS += \
     connectionmanager.h \
     mysqlconnectioneditwidget.h \
     sqliteconnectioneditwidget.h \
-    connections.h
+    connections.h \
+    mysqlconnectionvalidator.h \
+    sqliteconnectionvalidator.h
 
 FORMS += \
     mainwindow.ui \

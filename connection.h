@@ -20,8 +20,8 @@ class Connection : public QObject
     Q_OBJECT
 
 private:
-    uint lastQueryTime = 0;
-    ConnectionInfo* connectionInfo = NULL;
+    long lastQueryTime = 0;
+    ConnectionInfo* connectionInfo = nullptr;
 
 protected:
     QSqlDatabase database;
@@ -29,16 +29,18 @@ protected:
     QString activeTableName;
     QString activeDatabaseName;
 
-    QTreeView* databaseListView = NULL;
-    QTableView* queryResultView = NULL;
-    TextEdit* queryRequestView = NULL;
-    QTextEdit* informationView = NULL;
-    QCompleter* completer = NULL;
-    QStandardItemModel* databaseCollection = NULL;
-    QStandardItemModel* queryResultModel = NULL;
+    QTreeView* databaseListView = nullptr;
+    QTableView* queryResultView = nullptr;
+    TextEdit* queryRequestView = nullptr;
+    QTextEdit* informationView = nullptr;
+    QCompleter* completer = nullptr;
+    QStandardItemModel* databaseCollection = nullptr;
+    QStandardItemModel* queryResultModel = nullptr;
+
+signals:
+    void connectionError(QString);
 
 public:
-    Connection();
     ~Connection();
 
     virtual void init() = 0;
@@ -64,6 +66,7 @@ public:
     QSqlError lastError();
     void close();
     bool open();
+    bool isOpen();
 
     QSqlQuery sendQuery(QSqlQuery query);
     QSqlQuery sendQuery(QString queryString);
