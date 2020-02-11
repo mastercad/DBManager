@@ -42,17 +42,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    qDebug() << "START!";
     ui->setupUi(this);
     QMainWindow::showMaximized();
+    qDebug() << "Create ConnectionFactory";
     connectionFactory = new ConnectionFactory;
+    qDebug() << "Create ConnectionInfoFactory";
     connectionInfoFactory = new ConnectionInfoFactory;
+    qDebug() << "set Connections to ConnectionInfoFactory";
     connectionInfoFactory->setConnections(&connections);
     setWindowTitle(QString("%1").arg("Database Manager"));
 
     ui->queryResult->setSortingEnabled(true);
 
+    qDebug() << "LoadConnectionInfos";
     loadConnectionInfos();
 
+    ui->databaseList->setContextMenuPolicy(Qt::CustomContextMenu);
+    qDebug() << "Connect SIGNALS!";
     connect(ui->btnQueryExecute, SIGNAL(clicked(bool)), this, SLOT(onExecuteQueryClicked()));
     connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(close()));
     connect(ui->actionEditConnection, SIGNAL(triggered(bool)), this, SLOT(openConnectionManagerWindow()));
@@ -60,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(createConnectionSubMenu()));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(saveConnectionInfos()));
+    qDebug() << "SIGNALS connected";
 }
 
 void MainWindow::openNewConnectionWindow() {
@@ -158,10 +166,15 @@ void MainWindow::saveConnectionInfos() {
 }
 
 void MainWindow::loadConnectionInfos() {
+    qDebug() << "Open Config File!";
     QFile file("DBManager.xml");
+    qDebug() << "Config File loadet!";
     file.open(QFile::ReadOnly | QFile::Text);
     QXmlStreamReader stream(&file);
+
+    qDebug() << "Clear Connections!";
     connections.clear();
+    qDebug() << "Connections Cleared!";
 
     while(!stream.atEnd()
         && !stream.hasError()
@@ -182,12 +195,6 @@ void MainWindow::loadConnectionInfos() {
 }
 
 void MainWindow::storeConnectionInfo(ConnectionInfo* connectionInfo) {
-//    QMap<QString, ConnectionInfo*>connectionInfos;
-//    if (connections.contains(connectionInfo->getConnectionType())) {
-//        connectionInfos = connections[connectionInfo->getConnectionType()];
-//    }
-//    connectionInfos[connectionInfo->getConnectionName()] = connectionInfo;
-//    connections[connectionInfo->getConnectionType()] = connectionInfos;
     connections.insert(connectionInfo);
     connectionsSaved = false;
 
@@ -206,6 +213,7 @@ void MainWindow::onEstablishNewConnection(QAction *action) {
 Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection = connectionFactory->create(connectionInfo);
     connect(dbConnection, SIGNAL(connectionError(QString)), this, SLOT(handleConnectionError(QString)));
+    connect(ui->databaseList, SIGNAL(customContextMenuRequested(const QPoint&)), this->dbConnection, SLOT(handleContextMenuClicked(const QPoint&)));
 
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
@@ -239,6 +247,7 @@ void MainWindow::onExecuteQueryClicked() {
 
     if (query.isActive()) {
         QSqlRecord localRecord = query.record();
+        qDebug() << "Local Record: " << localRecord;
         for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
             QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
             queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);

@@ -18,6 +18,7 @@ public:
 
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
+    void handleContextMenuClicked(const QPoint&);
 };
 
 #endif // SQLITECONNECTION_H

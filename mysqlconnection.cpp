@@ -8,6 +8,7 @@
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QModelIndex>
+#include <QMenu>
 
 #include <QDebug>
 
@@ -121,6 +122,26 @@ void MysqlConnection::collectTableInformations() {
     qDebug() << keywords;
     */
 //    switchDatabase(databaseName);
+}
+
+void MysqlConnection::handleContextMenuClicked(const QPoint& position) {
+    qDebug() << "CONTEXT MENU ON DATABASELIST!";
+
+    QString clickedItem = this->databaseCollection->data(this->databaseListView->indexAt(position)).toString();
+    QStandardItem* item = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(position));
+
+    qDebug() << "Clicked at " << clickedItem;
+    qDebug() << "Item: " << item;
+
+    QMenu menu;
+    menu.addAction("Test");
+    menu.addAction("Test 1");
+
+
+//    QAction *selected = menu.exec(mapToGlobal(evet->pos()));
+    if (menu.exec(this->databaseListView->mapToGlobal(position))) {
+
+    }
 }
 
 void MysqlConnection::handleDatabaseClicked(QModelIndex index) {

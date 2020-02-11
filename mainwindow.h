@@ -13,6 +13,7 @@
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 #include <QCompleter>
+#include <QPoint>
 
 class QTreeModel;
 

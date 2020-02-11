@@ -73,6 +73,7 @@ public:
 
 public slots:
     virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
+    virtual void handleContextMenuClicked(const QPoint& position) = 0;
 };
 
 #endif // CONNECTION_H

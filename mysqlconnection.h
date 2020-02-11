@@ -16,6 +16,7 @@ private:
 
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
+    void handleContextMenuClicked(const QPoint&);
 
 public:
     void init();

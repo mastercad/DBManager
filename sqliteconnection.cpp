@@ -60,6 +60,10 @@ void SqliteConnection::loadTablesList() {
     }
 }
 
+void SqliteConnection::handleContextMenuClicked(const QPoint& position) {
+
+}
+
 void SqliteConnection::handleTableClicked(QModelIndex index) {
     // 172.19.2.2
 //    activeDatabase = QString(item->parent()->text());
