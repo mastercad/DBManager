@@ -1,6 +1,6 @@
 # MYSQL installieren / bauen:
 sudo apt install libmysqlclient-dev libqt5sql5-mysql
-sudo apt install libmysqlcppconn-dev
+sudo apt install libmysqlcppconn-dev libclang-cpp10 libllvm10
 
 # Beim start von DBManager kam immer Speicherzugriffsfehler
 - Das Problem trat immer nur auf, wenn ich es geuploadet habe. scheinbar schneidet hier der FTP etwas ab
@@ -243,3 +243,143 @@ Versionsreferenzen:
     0x058a2819 0x00 08 Qt_5.9
     0x00058a25 0x00 03 Qt_5
   von libQt5Widgets.so.5 benötigt:
+
+# ich habe es erfolglos mit
+- strip DBManager
+# und
+- chrpath -d DBManager
+# versucht, hat sich nichts geändert.
+
+# qt statisch builden:
+mkdir /media/Austausch/Qt
+cd /media/Austausch/Qt
+git clone git://code.qt.io/qt/qt5.git
+cd qt5
+perl init-repository
+export LLVM_INSTALL_DIR=/usr/llvm
+../qt5/.configure -static -prefix /media/Austausch/Qt/qt5/qtbase -developer-build -opensource -nomake examples -nomake tests
+make
+
+# weitere vorlage war diese hier. damit habe ich die Qt sources das 2. mal gebaut
+https://retifrav.github.io/blog/2018/02/17/build-qt-statically/
+
+./configure -static -prefix /media/Austausch/Qt/5.15_static_new -release -ltcg -optimize-size -no-pch -confirm-license -opengl -system-xcb -qt-libpng -qt-libjpeg -qt-zlib -qt-pcre -gtk -system-freetype -system-harfbuzz -pulseaudio -alsa
+./configure -static -prefix /media/Austausch/Qt/5.15_static -release -ltcg -optimize-size -no-pch -confirm-license -opengl -qt-libpng -qt-libjpeg -qt-zlib -qt-pcre -gtk -system-freetype -system-harfbuzz -pulseaudio -alsa -sql-mysql -sqlite -sql-db2 -sql-ibase -sql-oci -sql-odbc -sql-psql -sql-sqlite2 -sql-sqlite -sql-tds
+
+#letzte ausführung:
+./configure -static -prefix /media/Austausch/Qt/5.15_static -release -ltcg -optimize-size -no-pch -confirm-license -opengl -qt-libpng -qt-libjpeg -qt-zlib -qt-pcre -gtk -qt-freetype
+
+# dev libs installieren:
+sudo apt install libfreetype6-dev libclang-dev gperf bison bison-doc bisonc++ bisonc++-doc flexc flex pkg-config-x86-64-linux-gnu pkg-config-i686-linux-gnu
+
+# klappte alles nicht, verfolge jetzt folgenden plan:
+https://wohlsoft.ru/pgewiki/Building_static_Qt_5
+
+sudo apt install libnss3-dev
+
+# ablauf:
+make clean
+rm -rf config.cache
+./configure -static -prefix /media/Austausch/Qt/5.15_static -release -ltcg -optimize-size -no-pch -confirm-license -opengl -qt-libpng -qt-libjpeg -qt-zlib -qt-pcre -gtk -qt-freetype
+PATH=/media/Austausch/Qt/qt5/qtbase/bin:$PATH
+export PATH
+qmake -config release
+make
+
+# hilfreich:
+https://wiki.qt.io/Building_Qt_5_from_Git
+#ablauf:
+# vorbereitung:
+sudo apt-get build-dep qt5-default
+sudo apt-get install libxcb-xinerama0-dev
+
+sudo apt-get install build-essential perl python git
+sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev
+sudo apt-get install flex bison gperf libicu-dev libxslt-dev ruby
+sudo apt-get install libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-dev libfontconfig1-dev libcap-dev libxtst-dev libpulse-dev libudev-dev libpci-dev libnss3-dev libasound2-dev libxss-dev libegl1-mesa-dev gperf bison
+sudo apt-get install libbz2-dev libgcrypt11-dev libdrm-dev libcups2-dev libatkmm-1.6-dev
+sudo apt-get install libasound2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt install libclang-6.0-dev llvm-6.0
+
+# auschecken:
+git clone git://code.qt.io/qt/qt5.git
+cd qt5
+git checkout 5.15
+(git submodule update --init --recursive)
+perl init-repository
+
+# konfigurieren und erstellen:
+export LLVM_INSTALL_DIR=/usr/llvm
+#../qt5/configure -developer-build -opensource -nomake examples -nomake tests
+./configure -static -prefix /media/Austausch/Qt/5.15_static -ltcg -optimize-size -no-pch -confirm-license -opengl -qt-libpng -qt-libjpeg -qt-zlib -qt-pcre -gtk -qt-freetype -pulseaudio -alsa -opensource
+
+make -j4
+
+# versuche gerade noch einen anderen build mit:
+# problem war, dass wayland und xcb probleme gemacht haben. mal wieder.
+./configure -prefix /media/Austausch/Qt/5.15_static -sysconfdir /etc/xdg -confirm-license -opensource -static -dbus-linked -openssl-linked -system-harfbuzz -system-sqlite -nomake examples -no-rpath -skip qtwebengine
+
+# die app wird erstmal erstellt und ist jetzt 15MB groß statt 400Kb
+# es kommt aber :
+qt.qpa.plugin: Could not find the Qt platform plugin "xcb" in ""
+# mit
+export QT_DEBUG_PLUGINS=1
+# keine ahnung ob das vorher auch schon kam, jetzt steht da aber jedenfalls noch
+QFactoryLoader::QFactoryLoader() ignoring "org.qt-project.Qt.QPA.QPlatformIntegrationFactoryInterface.5.3" since plugins are disabled in static builds
+
+##########################
+# APP erstellen
+##########################
+make clean
+PATH=/media/Austausch/Qt/5.15_static/bin:$PATH
+export PATH
+qmake -config release
+make
+
+##########################
+# SQLDRIVER erstellen
+##########################
+cd /media/Austausch/Qt/qt5/qtbase/src/plugins/sqldrivers/mysql
+make clean
+qmake -- MYSQL_INCDIR=/usr/include MYSQL_LIBDIR=/usr/lib
+make
+make install
+
+
+# ich habe jetzt linuxdeployqt auf docker installiert. scheint erstmal an sich zu laufen:
+Install Docker:
+wget https://raw.githubusercontent.com/J-Rios/BASH-Scripts/master/install/install_docker
+sudo chmod +x install_docker
+sudo ./install_docker
+Get Ubuntu 14.04 Docker base image:
+sudo docker pull ubuntu:trusty
+Launch a container of the downloaded Ubuntu image:
+sudo docker run -d --name dockerdeployqt -it ubuntu:trusty
+Enter the Container and get all required elements:
+sudo docker exec -it dockerdeployqt bash
+cd /root
+apt-get update
+apt-get -y install wget
+apt-get -y install libglib2.0-0
+Install QT5:
+wget https://raw.githubusercontent.com/J-Rios/BASH-Scripts/master/install/install_qt5
+chmod +x install_qt5
+./install_qt5
+rm -f ./install_qt5
+Get and setup linuxdeployqt tool:
+wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+chmod +x linuxdeployqt-6-x86_64.AppImage
+./linuxdeployqt-6-x86_64.AppImage --appimage-extract
+mv squashfs-root deployqt
+ln -s /root/deployqt/AppRun /usr/local/sbin/linuxdeployqt
+rm -f linuxdeployqt-6-x86_64.AppImage
+Check that linuxdeployqt is working:
+linuxdeployqt
+Exit the Container ad stop it (everything is ready to be used):
+exit
+sudo docker stop dockerdeployqt
+
+# ist von: https://gist.github.com/J-Rios/e4e6575624af2068c8927541213c5cd1
+
+# auf dem container habe ich installiert:
+apt update -y && apt install -y git build-essential wget doxygen pkg-config qt5-default qtbase5-dev qtdeclarative5-dev qtdeclarative5-dev-tools qttools5-dev-tools

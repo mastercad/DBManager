@@ -6,6 +6,9 @@
 
 QT       += core gui sql
 
+CONFIG -= import_plugins
+CONFIG += c++11
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = DBManager
@@ -24,9 +27,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 LIBS    += -lGL
 LIBS    += -L/usr/local/lib -L/usr/lib -lmysqlcppconn
+#LIBS    += -L/media/Austausch/Qt/5.15_static/lib -lmysqlcppconn
 
-INCLUDEPATH += -I/usr/include -I/usr/local/include
-               -I/usr/local/include/cppconn
+INCLUDEPATH += -I/usr/include -I/usr/local/include -I/usr/local/include/cppconn
+#INCLUDEPATH += -I/media/Austausch/Qt/5.15_static/include -I/usr/local/include/cppconn
 
 SOURCES += \
     main.cpp \

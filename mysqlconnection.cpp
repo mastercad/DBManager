@@ -3,12 +3,18 @@
 #include "defaults.h"
 
 #include <QStandardItemModel>
+#include <QGuiApplication>
+#include <QApplication>
+#include <QClipboard>
 #include <QHeaderView>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QModelIndex>
+#include <QMimeData>
+#include <QList>
 #include <QMenu>
+#include <QFont>
 
 #include <QDebug>
 
@@ -124,23 +130,46 @@ void MysqlConnection::collectTableInformations() {
 //    switchDatabase(databaseName);
 }
 
-void MysqlConnection::handleContextMenuClicked(const QPoint& position) {
-    qDebug() << "CONTEXT MENU ON DATABASELIST!";
-
+void MysqlConnection::handleDatabaseContextMenuClicked(const QPoint& position) {
     QString clickedItem = this->databaseCollection->data(this->databaseListView->indexAt(position)).toString();
-    QStandardItem* item = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(position));
-
-    qDebug() << "Clicked at " << clickedItem;
-    qDebug() << "Item: " << item;
+    currentContextMenuItem = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(position));
 
     QMenu menu;
-    menu.addAction("Test");
-    menu.addAction("Test 1");
+    QAction actionDeleteTable(tr("Delete Table"));
+    menu.addAction(&actionDeleteTable);
+    QAction actionTruncateTable(tr("Truncate Table"));
+    menu.addAction(&actionTruncateTable);
+    QAction actionRenameTable(tr("Rename Table"));
+    menu.addAction(&actionRenameTable);
 
+    connect(&actionTruncateTable, SIGNAL(triggered()), this, SLOT(truncateTable()));
+    connect(&actionDeleteTable, SIGNAL(triggered()), this, SLOT(deleteTable()));
+    connect(&actionRenameTable, SIGNAL(triggered()), this, SLOT(renameTable()));
 
 //    QAction *selected = menu.exec(mapToGlobal(evet->pos()));
     if (menu.exec(this->databaseListView->mapToGlobal(position))) {
+        this->currentContextMenuItem = nullptr;
+    }
+}
 
+void MysqlConnection::truncateTable() {
+    if (nullptr != currentContextMenuItem) {
+        qDebug() << "Truncate!";
+        qDebug() << currentContextMenuItem->text();
+    }
+}
+
+void MysqlConnection::deleteTable() {
+    if (nullptr != currentContextMenuItem) {
+        qDebug() << "Delete!";
+        qDebug() << currentContextMenuItem->text();
+    }
+}
+
+void MysqlConnection::renameTable() {
+    if (nullptr != currentContextMenuItem) {
+        qDebug() << "Rename!";
+        qDebug() << currentContextMenuItem->text();
     }
 }
 
@@ -154,17 +183,21 @@ void MysqlConnection::handleDatabaseClicked(QModelIndex index) {
 
     int row = index.row();
     int column = index.column();
+    currentDatabaseItem = databaseCollection->item(row, column);
 
     // 172.19.2.2
     if (query.isActive()) {
         emit databaseCollection->layoutAboutToBeChanged();
-        databaseCollection->item(row, column)->removeRows(0, databaseCollection->item(row)->rowCount());
+        QFont font;
+        font.setBold(true);
+        currentDatabaseItem->setFont(font);
+        currentDatabaseItem->removeRows(0, databaseCollection->item(row)->rowCount());
         while (query.next()) {
             QString tableName = query.value(0).toString();
             QStandardItem* item = new QStandardItem(tableName);
             item->setToolTip(tableName);
             item->setEditable(false);
-            databaseCollection->item(row, column)->appendRow(item);
+            currentDatabaseItem->appendRow(item);
         }
         emit databaseCollection->layoutChanged();
     }
@@ -178,6 +211,21 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     // make sure between multiple databases, the correct database to clicked table is connected
     switchDatabase(activeDatabaseName);
 
+    if (nullptr != currentTableItem) {
+        QFont font;
+        font.setBold(false);
+        currentTableItem->setFont(font);
+    }
+
+    currentTableItem = item;
+    currentDatabaseItem = item->parent();
+
+    QFont font;
+    font.setBold(true);
+    currentTableItem->setFont(font);
+    currentDatabaseItem->setFont(font);
+
+    queryResultModel = nullptr;
     delete queryResultModel;
     queryResultModel = new QStandardItemModel;
 
@@ -197,8 +245,9 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
         while (query.next()) {
             QSqlRecord currentRecord = query.record();
             for (int currentColumn = 0; currentColumn < currentRecord.count(); ++currentColumn) {
-                QStandardItem* value = new QStandardItem(currentRecord.field(currentColumn).value().toString());
-                queryResultModel->setItem(currentRow, currentColumn, value);
+                QVariant variant = currentRecord.field(currentColumn).value();
+                QStandardItem* cellItem = new QStandardItem(variant.isNull() ? "NULL" : variant.toString());
+                queryResultModel->setItem(currentRow, currentColumn, cellItem);
             }
             ++currentRow;
         }
@@ -207,12 +256,210 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     queryResultView->resizeColumnsToContents();
 }
 
+void MysqlConnection::handleResultTableContextMenuClicked(const QPoint& point) {
+    currentContextMenuItem = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(point));
+    QMenu *menu=new QMenu();
+    QAction copyAction(tr("copy"), this);
+    connect(&copyAction, SIGNAL(triggered()), this, SLOT(copyResultViewSelection()));
+    menu->addAction(&copyAction);
+
+    QAction deleteAction(tr("delete"), this);
+    connect(&deleteAction, SIGNAL(triggered()), this, SLOT(deleteResultViewSelection()));
+    menu->addAction(&deleteAction);
+
+    QAction pasteAction(tr("paste"), this);
+    connect(&pasteAction, SIGNAL(triggered()), this, SLOT(pasteToResultView()));
+    menu->addAction(&pasteAction);
+
+    QAction insertNullAction(tr("insert NULL"));
+    connect(&insertNullAction, SIGNAL(triggered()), this, SLOT(insertNullToResultView()));
+    menu->addAction(&insertNullAction);
+
+    if (menu->exec(queryResultView->viewport()->mapToGlobal(point))) {
+        this->currentContextMenuItem = nullptr;
+    }
+}
+
+void MysqlConnection::copyResultViewSelection() {
+    int minRow = queryResultModel->rowCount();
+    int maxRow = -1;
+    int minCol = queryResultModel->columnCount();
+    int maxCol = -1;
+
+    QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
+
+    foreach (QModelIndex index, indexes) {
+        minRow = qMin(minRow, index.row());
+        maxRow = qMax(maxRow, index.row());
+        minCol = qMin(minCol, index.column());
+        maxCol = qMax(maxCol, index.column());
+    }
+
+    if (0 > maxCol
+        || 0 > maxRow
+    ) {
+        return;
+    }
+
+    // only one cell selected
+    if (minRow == maxRow
+        && minCol == maxCol
+    ) {
+        QVariant variant = queryResultModel->data(queryResultModel->index(minRow, minCol));
+        QApplication::clipboard()->setText(variant.toString());
+        return;
+    }
+
+    QString data = "<!--StartFragment-->\n";
+    QString plainData = "";
+    data += "<table>";
+
+    for (int row = minRow; row <= maxRow; row++) {
+        data += "<tr>\n";
+        for (int col = minCol; col <= maxCol; col++) {
+            QVariant variant = queryResultModel->data(queryResultModel->index(row, col));
+            if (variant.canConvert(QVariant::Double)) {
+                data += "  <td x:num>";
+                if (col != minCol) {
+                    plainData += "\t";
+                }
+            } else {
+                data += "  <td>";
+                if (col != minCol) {
+                    plainData += "\t";
+                }
+            }
+
+            data += variant.toString();
+            data += "</td>\n";
+            plainData += variant.toString();
+        }
+        data += "</tr>\n";
+        plainData += "\n";
+    }
+
+    data += "</table>";
+    data += "<!--EndFragment-->\n";
+
+    QMimeData* mimeData = new QMimeData;
+    mimeData->setText(plainData);
+    mimeData->setHtml(data);
+    QApplication::clipboard()->setMimeData(mimeData);
+}
+
+void MysqlConnection::deleteResultViewSelection() {
+    int minRow = queryResultModel->rowCount();
+    int maxRow = -1;
+    int minCol = queryResultModel->columnCount();
+    int maxCol = -1;
+
+    QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
+
+    foreach (QModelIndex index, indexes) {
+        minRow = qMin(minRow, index.row());
+        maxRow = qMax(maxRow, index.row());
+        minCol = qMin(minCol, index.column());
+        maxCol = qMax(maxCol, index.column());
+    }
+    if (0 > maxCol
+        || 0 > maxRow
+    ) {
+        return;
+    }
+
+    // only one cell selected
+    if (minRow == maxRow
+        && minCol == maxCol
+    ) {
+        emit queryResultModel->layoutAboutToBeChanged();
+        queryResultModel->removeRows(minRow, (maxRow - minRow) + 1);
+        emit queryResultModel->layoutChanged();
+        return;
+    }
+}
+
+void MysqlConnection::pasteToResultView() {
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    int minRow = queryResultModel->rowCount();
+    int maxRow = -1;
+    int minCol = queryResultModel->columnCount();
+    int maxCol = -1;
+
+    QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
+
+    foreach (QModelIndex index, indexes) {
+        minRow = qMin(minRow, index.row());
+        maxRow = qMax(maxRow, index.row());
+        minCol = qMin(minCol, index.column());
+        maxCol = qMax(maxCol, index.column());
+    }
+
+    if (0 > maxCol
+        || 0 > maxRow
+    ) {
+        return;
+    }
+
+    for (int row = minRow; row <= maxRow; row++) {
+        for (int col = minCol; col <= maxCol; col++) {
+            queryResultModel->itemFromIndex(queryResultModel->index(row, col))->setText(clipboard->text());
+        }
+    }
+}
+
+void MysqlConnection::insertNullToResultView() {
+    int minRow = queryResultModel->rowCount();
+    int maxRow = -1;
+    int minCol = queryResultModel->columnCount();
+    int maxCol = -1;
+
+    QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
+
+    foreach (QModelIndex index, indexes) {
+        minRow = qMin(minRow, index.row());
+        maxRow = qMax(maxRow, index.row());
+        minCol = qMin(minCol, index.column());
+        maxCol = qMax(maxCol, index.column());
+    }
+
+    if (0 > maxCol
+        || 0 > maxRow
+    ) {
+        return;
+    }
+
+    for (int row = minRow; row <= maxRow; row++) {
+        for (int col = minCol; col <= maxCol; col++) {
+            queryResultModel->itemFromIndex(queryResultModel->index(row, col))->setText("NULL");
+        }
+    }
+}
+
 bool MysqlConnection::switchDatabase(QString databaseName) {
+
+    if (nullptr != currentDatabaseItem
+        && currentDatabaseItem->text() == databaseName
+    ) {
+        return true;
+    }
+
+    if (nullptr != currentTableItem) {
+        QFont font;
+        font.setBold(false);
+        currentTableItem->setFont(font);
+    }
+
     if (database.isOpen()) {
         database.close();
     }
 
     database.setDatabaseName(databaseName);
+
+    if (nullptr != currentDatabaseItem) {
+        QFont font;
+        font.setBold(false);
+        currentDatabaseItem->setFont(font);
+    }
 
     if (!database.open()) {
         qWarning() << database.lastError();

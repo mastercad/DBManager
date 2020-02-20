@@ -60,7 +60,39 @@ void SqliteConnection::loadTablesList() {
     }
 }
 
-void SqliteConnection::handleContextMenuClicked(const QPoint& position) {
+void SqliteConnection::handleDatabaseContextMenuClicked(const QPoint& position) {
+
+}
+
+void SqliteConnection::truncateTable() {
+
+}
+
+void SqliteConnection::deleteTable() {
+
+}
+
+void SqliteConnection::renameTable() {
+
+}
+
+void SqliteConnection::handleResultTableContextMenuClicked(const QPoint& position) {
+
+}
+
+void SqliteConnection::copyResultViewSelection() {
+
+}
+
+void SqliteConnection::deleteResultViewSelection() {
+
+}
+
+void SqliteConnection::pasteToResultView() {
+
+}
+
+void SqliteConnection::insertNullToResultView() {
 
 }
 

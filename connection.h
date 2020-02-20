@@ -13,6 +13,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QTextEdit>
+#include <QPoint>
 #include <QCompleter>
 
 class Connection : public QObject
@@ -73,7 +74,15 @@ public:
 
 public slots:
     virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
-    virtual void handleContextMenuClicked(const QPoint& position) = 0;
+    virtual void handleDatabaseContextMenuClicked(const QPoint& position) = 0;
+    virtual void handleResultTableContextMenuClicked(const QPoint& position) = 0;
+    virtual void truncateTable() = 0;
+    virtual void deleteTable() = 0;
+    virtual void renameTable() = 0;
+    virtual void copyResultViewSelection() = 0;
+    virtual void deleteResultViewSelection() = 0;
+    virtual void pasteToResultView() = 0;
+    virtual void insertNullToResultView() = 0;
 };
 
 #endif // CONNECTION_H
