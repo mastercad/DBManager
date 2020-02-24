@@ -30,9 +30,9 @@ public slots:
     bool validatePage();
 
 private:
-    QLineEdit* filePathNameEdit = NULL;
-    QLineEdit* nameEdit = NULL;
-    QLineEdit* sqliteConnectionValid = NULL;
+    QLineEdit* filePathNameEdit = nullptr;
+    QLineEdit* nameEdit = nullptr;
+    QLineEdit* sqliteConnectionValid = nullptr;
     QSqlDatabase database;
 };
 

@@ -43,7 +43,7 @@ private:
     QWidget* lastEditWidget = nullptr;
     Ui::ConnectionManager *ui;
     MainWindow* parent;
-//    QMap<QString, QMap<QString, ConnectionInfo *> >* connections = NULL;
+//    QMap<QString, QMap<QString, ConnectionInfo *> >* connections = nullptr;
     Connections* connections = nullptr;
 };
 

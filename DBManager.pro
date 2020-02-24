@@ -35,16 +35,12 @@ INCLUDEPATH += -I/usr/include -I/usr/local/include -I/usr/local/include/cppconn
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    newconnectionwindow.cpp \
     textedit.cpp \
     connectionfactory.cpp \
-    connectionwithlogindialog.cpp \
-    connectionwithfiledialog.cpp \
     newconnectionwizard.cpp \
     connectionwizardintropage.cpp \
     connectionwizardmysqlpage.cpp \
     connectionwizardsqlitepage.cpp \
-    connectionwizardfinalpage.cpp \
     connection.cpp \
     mysqlconnection.cpp \
     sqliteconnection.cpp \
@@ -61,16 +57,12 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    newconnectionwindow.h \
     textedit.h \
     connectionfactory.h \
-    connectionwithlogindialog.h \
-    connectionwithfiledialog.h \
     newconnectionwizard.h \
     connectionwizardintropage.h \
     connectionwizardmysqlpage.h \
     connectionwizardsqlitepage.h \
-    connectionwizardfinalpage.h \
     connection.h \
     mysqlconnection.h \
     sqliteconnection.h \
@@ -87,16 +79,19 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui \
-    newconnectionwindow.ui \
-    connectionwithlogindialog.ui \
-    connectionwithfiledialog.ui \
     connectionmanager.ui \
     mysqlconnectioneditwidget.ui \
     sqliteconnectioneditwidget.ui
 
 DISTFILES += \
     README.md \
-    TODO.md
+    TODO.md \
+    translations/dbManager_de_DE.qph
 
 RESOURCES += \
     resources.qrc
+
+TRANSLATIONS += translations/dbManager_de.ts \
+    translations/dbManager_en.ts
+
+CODECFORSRC     = UTF-8

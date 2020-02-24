@@ -33,7 +33,7 @@ private:
     ConnectionInfo* generateConnectionInfo();
 
     ConnectionManager* parent = nullptr;
-//    QMap<QString, QMap<QString, ConnectionInfo*> >* connections = NULL;
+//    QMap<QString, QMap<QString, ConnectionInfo*> >* connections = nullptr;
     Connections* connections = nullptr;
     Ui::MysqlConnectionEditWidget *ui;
     ConnectionInfo* currentConnectionInfo = nullptr;

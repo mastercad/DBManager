@@ -6,6 +6,7 @@
 // needed for field actions...
 #include <QVariant>
 #include <QXmlStreamAttributes>
+#include <QCoreApplication>
 #include <QMapIterator>
 #include <QDebug>
 
@@ -105,7 +106,7 @@ ConnectionInfo* ConnectionInfoFactory::create(ConnectionWizardMysqlPage* wizardP
 }
 
 QString ConnectionInfoFactory::generateNewConnectionName(ConnectionInfo* connectionInfo, int currentNumber) {
-    QString connectionName = "NEW CONNECTION";
+    QString connectionName = QCoreApplication::translate("ConnectionInfoFactory", "NEW CONNECTION");
 
     if (0 < currentNumber) {
         connectionName = QString(connectionName + " " + QString::number(currentNumber));

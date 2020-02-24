@@ -6,10 +6,13 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QPoint>
+#include <QWidget>
 #include <QString>
 
 class MysqlConnection : public Connection
 {
+    using Connection::Connection;
+
 private:
     bool switchDatabase(QString databaseName);
     void handleTableClicked(QStandardItem* item);
@@ -20,8 +23,8 @@ private:
 
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
-    void handleDatabaseContextMenuClicked(const QPoint&);
-    void handleResultTableContextMenuClicked(const QPoint&);
+    void showDatabaseContextMenu(const QPoint&);
+    void showResultTableContextMenu(const QPoint&);
     void truncateTable();
     void deleteTable();
     void renameTable();

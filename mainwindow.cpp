@@ -44,10 +44,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     QMainWindow::showMaximized();
-    connectionFactory = new ConnectionFactory;
+    connectionFactory = new ConnectionFactory(this);
     connectionInfoFactory = new ConnectionInfoFactory;
     connectionInfoFactory->setConnections(&connections);
     setWindowTitle(QString("%1").arg("Database Manager"));
+
+    QIcon executeIcon(":/icons/ausfuehren_schatten.png");
+    ui->btnQueryExecute->setIcon(executeIcon);
 
     ui->queryResult->setSortingEnabled(true);
 
@@ -65,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::openNewConnectionWindow() {
     NewConnectionWizard wizard;
+
     if (wizard.exec()) {
         if (nullptr != dbConnection) {
             dbConnection->close();
@@ -99,6 +103,30 @@ void MainWindow::createConnectionSubMenu() {
         }
         ui->menuVerbinden->addMenu(typeMenu);
         ++typeIterator;
+    }
+}
+
+void MainWindow::showResultTableContextMenu(const QPoint& point) {
+    QMenu *menu=new QMenu();
+//    QAction copyAction(tr("copy"), this);
+    QAction copyAction(QCoreApplication::tr("copy"));
+    connect(&copyAction, SIGNAL(triggered()), dbConnection, SLOT(copyResultViewSelection()));
+    menu->addAction(&copyAction);
+
+    QAction deleteAction(tr("delete"), this);
+    connect(&deleteAction, SIGNAL(triggered()), dbConnection, SLOT(deleteResultViewSelection()));
+    menu->addAction(&deleteAction);
+
+    QAction pasteAction(tr("paste"), this);
+    connect(&pasteAction, SIGNAL(triggered()), dbConnection, SLOT(pasteToResultView()));
+    menu->addAction(&pasteAction);
+
+    QAction insertNullAction(tr("insert NULL"));
+    connect(&insertNullAction, SIGNAL(triggered()), dbConnection, SLOT(insertNullToResultView()));
+    menu->addAction(&insertNullAction);
+
+    if (menu->exec(ui->queryResult->viewport()->mapToGlobal(point))) {
+//        this->currentContextMenuItem = nullptr;
     }
 }
 
@@ -201,9 +229,9 @@ void MainWindow::onEstablishNewConnection(QAction *action) {
 Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection = connectionFactory->create(connectionInfo);
     connect(dbConnection, SIGNAL(connectionError(QString)), this, SLOT(handleConnectionError(QString)));
-    connect(ui->databaseList, SIGNAL(customContextMenuRequested(const QPoint&)), this->dbConnection, SLOT(handleDatabaseContextMenuClicked(const QPoint&)));
+    connect(ui->databaseList, SIGNAL(customContextMenuRequested(const QPoint&)), this->dbConnection, SLOT(showDatabaseContextMenu(const QPoint&)));
     ui->queryResult->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->queryResult, SIGNAL(customContextMenuRequested(QPoint)), this->dbConnection, SLOT(handleResultTableContextMenuClicked(QPoint)));
+    connect(ui->queryResult, SIGNAL(customContextMenuRequested(QPoint)), this->dbConnection, SLOT(showResultTableContextMenu(QPoint)));
 
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
@@ -228,7 +256,7 @@ void MainWindow::onExecuteQueryClicked() {
     QString queryString = ui->queryRequest->toPlainText();
 
     if (nullptr == dbConnection) {
-        this->ui->information->append("No Connection established!");
+        this->ui->information->append(tr("No Connection established!"));
         return;
     }
     QSqlQuery query = dbConnection->sendQuery(queryString);
@@ -257,7 +285,7 @@ void MainWindow::onExecuteQueryClicked() {
     }
     ui->queryResult->setModel(queryResultModel);
     ui->queryResult->resizeColumnsToContents();
-    statusBar()->showMessage("connected!");
+    statusBar()->showMessage(tr("connected!"));
 }
 
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {
@@ -266,6 +294,5 @@ void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {
 
 MainWindow::~MainWindow() {
     delete ui;
-    delete newConnectionWindow;
 //    delete queryResultModel;
 }

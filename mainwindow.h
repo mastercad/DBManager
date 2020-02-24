@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "newconnectionwindow.h"
 #include "connectionfactory.h"
 #include "connection.h"
 #include "connections.h"
@@ -44,6 +43,7 @@ private:
     void handleDatabaseClicked(QModelIndex index);
     void handleTableClicked(QStandardItem* item);
     bool switchDatabase(QString databaseName);
+    void showResultTableContextMenu(const QPoint& point);
     void collectTableInformations();
     void storeConnectionInfo(ConnectionInfo* connectionInfo);
     void loadConnectionInfos();
@@ -53,7 +53,6 @@ private:
     QSqlQuery sendQuery(QSqlQuery query);
     QSqlQuery sendQuery(QString queryString);
 
-    NewConnectionWindow* newConnectionWindow = nullptr;
     Connection* dbConnection = nullptr;
     ConnectionInfo* connectionInfo= nullptr;
 

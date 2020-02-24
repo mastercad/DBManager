@@ -3,16 +3,19 @@
 
 #include <QWizardPage>
 #include <QVBoxLayout>
+#include <QCoreApplication>
+
+#include <QDebug>
 
 ConnectionWizardIntroPage::ConnectionWizardIntroPage(QWidget* parent)
     : QWizardPage(parent)
 {
-    setTitle("Introduction");
+    setTitle(tr("Introduction"));
 //    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/logos/mysql.png"));
 
 //    setPixmap(QWizard::LogoPixmap, QPixmap(":/logos/mysql.png"));
 
-    topLabel = new QLabel(tr("This wizard will help you register your copy of"));
+    topLabel = new QLabel(tr("This wizard help you to create new connection to database."));
     topLabel->setWordWrap(true);
 
     btnMysqlConnection = new QPushButton();
@@ -29,6 +32,14 @@ ConnectionWizardIntroPage::ConnectionWizardIntroPage(QWidget* parent)
     layout->addWidget(btnSqliteConnection);
     setLayout(layout);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    if (isVisible()) {
+        qDebug() << "VISIBLE!";
+        wizard()->button(QWizard::NextButton)->setText(QCoreApplication::translate("ConnectionWizardIntroPage", "&Next"));
+        wizard()->button(QWizard::CancelButton)->setText(tr("Cancel"));
+        wizard()->button(QWizard::BackButton)->setText(tr("&Back"));
+        wizard()->button(QWizard::FinishButton)->setText(tr("&Finish"));
+    }
 
     connect(btnMysqlConnection, SIGNAL(clicked(bool)), this, SLOT(selectMysqlConnection()));
     connect(btnSqliteConnection, SIGNAL(clicked(bool)), this, SLOT(selectSqliteConnection()));

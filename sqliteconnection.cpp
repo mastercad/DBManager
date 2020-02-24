@@ -60,7 +60,7 @@ void SqliteConnection::loadTablesList() {
     }
 }
 
-void SqliteConnection::handleDatabaseContextMenuClicked(const QPoint& position) {
+void SqliteConnection::showDatabaseContextMenu(const QPoint& position) {
 
 }
 
@@ -76,7 +76,7 @@ void SqliteConnection::renameTable() {
 
 }
 
-void SqliteConnection::handleResultTableContextMenuClicked(const QPoint& position) {
+void SqliteConnection::showResultTableContextMenu(const QPoint& position) {
 
 }
 
@@ -97,8 +97,6 @@ void SqliteConnection::insertNullToResultView() {
 }
 
 void SqliteConnection::handleTableClicked(QModelIndex index) {
-    // 172.19.2.2
-//    activeDatabase = QString(item->parent()->text());
     QStandardItem* item = databaseCollection->itemFromIndex(index);
     activeTableName = item->text();
 
@@ -135,7 +133,7 @@ void SqliteConnection::onListViewDoubleClicked(const QModelIndex index) {
     databaseListView->setItemsExpandable(true);
     QStandardItem* currentItem = databaseCollection->itemFromIndex(index);
 
-    if (0 == currentItem) {
+    if (nullptr == currentItem) {
         return;
     }
 

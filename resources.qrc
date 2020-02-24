@@ -7,5 +7,16 @@
         <file>logos/sqlite_medium.png</file>
         <file>logos/sqlite_small.png</file>
         <file>icons/programm_icon.png</file>
+        <file>icons/ausfuehren_schatten.png</file>
+        <file>icons/kopieren_schatten.png</file>
+        <file>icons/muelleimer_geschlossen_schatten.png</file>
+        <file>icons/muelleimer_offen_schatten.png</file>
+        <file>icons/rueckgaengig_mit_schatten.png</file>
+        <file>icons/speichern_schatten.png</file>
+        <file>icons/wiederholen_mit_schatten.png</file>
+        <file>translations/dbManager_de.ts</file>
+        <file>translations/dbManager_en.ts</file>
+        <file>translations/dbManager.qph</file>
+        <file>translations/dbManager_de.qm</file>
     </qresource>
 </RCC>

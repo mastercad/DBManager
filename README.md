@@ -383,3 +383,15 @@ sudo docker stop dockerdeployqt
 
 # auf dem container habe ich installiert:
 apt update -y && apt install -y git build-essential wget doxygen pkg-config qt5-default qtbase5-dev qtdeclarative5-dev qtdeclarative5-dev-tools qttools5-dev-tools
+
+# Translations erzeugen:
+# folgende einträge in DBManager.pro einfügen:
+TRANSLATIONS += translations/dbManager_de.ts \
+    translations/dbManager_en.ts
+
+CODECFORSRC     = UTF-8
+# ausführen:
+lupdate DBManager.pro
+# qm datei erstellen:
+lrelease DBManager.pro
+

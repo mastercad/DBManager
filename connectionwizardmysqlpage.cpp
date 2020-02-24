@@ -13,12 +13,14 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 
+#include <QApplication>
+
 #include <QDebug>
 
 ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     : QWizardPage(parent)
 {
-    setTitle("Mysql Connection");
+    setTitle(tr("Mysql Connection"));
 //    setPixmap(QWizard::BackgroundPixmap, QPixmap(":/logos/mysql.png"));
     setPixmap(QWizard::WatermarkPixmap, QPixmap(":/logos/mysql_small.png"));
 
@@ -92,18 +94,19 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     registerField("mysql.database", databaseEdit);
 
     connect(btnTestConnection, SIGNAL(clicked(bool)), this, SLOT(validatePage()));
+}
 
-    if (isVisible()) {
-        wizard()->button(QWizard::NextButton)->setVisible(false);
-        wizard()->button(QWizard::NextButton)->setEnabled(false);
-        wizard()->button(QWizard::FinishButton)->setEnabled(false);
-    }
+void ConnectionWizardMysqlPage::initializePage() {
+    qDebug() << "INIT ConnectionWizardMysqlPage!";
+    wizard()->button(QWizard::NextButton)->setVisible(false);
+    wizard()->button(QWizard::NextButton)->setEnabled(false);
+    wizard()->button(QWizard::FinishButton)->setEnabled(false);
 }
 
 bool ConnectionWizardMysqlPage::validatePage() {
     ConnectionInfoFactory connectionInfoFactory;
     ConnectionInfo* connectionInfo = connectionInfoFactory.create(this);
-    ConnectionFactory connectionFactory;
+    ConnectionFactory connectionFactory(this);
     Connection* connection = connectionFactory.create(connectionInfo);
     MysqlConnectionValidator connectionValidator;
     bool result = false;
@@ -112,7 +115,7 @@ bool ConnectionWizardMysqlPage::validatePage() {
         wizard()->button(QWizard::NextButton)->setEnabled(true);
         wizard()->button(QWizard::FinishButton)->setEnabled(true);
         mysqlConnectionValidEdit->setText("YES");
-        informationTextEdit->setText("OK.");
+        informationTextEdit->setText(tr("OK."));
         informationTextEdit->hide();
 
 //        setField("mysql.connection.valid", mysqlConnectionValidEdit);

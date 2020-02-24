@@ -20,6 +20,8 @@ public:
         Type_Sqlite
     };
 
+    void initializePage() override;
+
     ConnectionWizardMysqlPage(QWidget* parent = nullptr);
 
     bool isComplete() const override;

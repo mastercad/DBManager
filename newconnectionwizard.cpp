@@ -2,7 +2,6 @@
 #include "connectionwizardintropage.h"
 #include "connectionwizardmysqlpage.h"
 #include "connectionwizardsqlitepage.h"
-#include "connectionwizardfinalpage.h"
 
 #include <QGridLayout>
 
@@ -14,7 +13,6 @@ NewConnectionWizard::NewConnectionWizard(QWidget* parent)
     setPage(Page_Intro, new ConnectionWizardIntroPage);
     setPage(Page_Mysql, new ConnectionWizardMysqlPage);
     setPage(Page_Sqlite, new ConnectionWizardSqlitePage);
-    setPage(Page_Finish, new ConnectionWizardFinalPage);
 
     setStartId(Page_Intro);
 
@@ -37,6 +35,15 @@ NewConnectionWizard::NewConnectionWizard(QWidget* parent)
 //void NewConnectionWizard::done(int state) {
 //    qDebug() << "Done State: " << state;
 //}
+
+void NewConnectionWizard::initializePage(int id) {
+    this->page(id)->initializePage();
+
+    this->button(QWizard::NextButton)->setText(tr("&Next"));
+    this->button(QWizard::CancelButton)->setText(tr("Cancel"));
+    this->button(QWizard::BackButton)->setText(tr("&Back"));
+    this->button(QWizard::FinishButton)->setText(tr("&Finish"));
+}
 
 void NewConnectionWizard::setDatabase(QSqlDatabase* database) {
     this->database = database;

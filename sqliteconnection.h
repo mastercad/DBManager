@@ -9,6 +9,8 @@
 
 class SqliteConnection : public Connection
 {
+    using Connection::Connection;
+
 private:
     void handleTableClicked(QModelIndex index);
     void loadDatabaseList();
@@ -19,8 +21,8 @@ public:
 
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
-    void handleDatabaseContextMenuClicked(const QPoint& position);
-    void handleResultTableContextMenuClicked(const QPoint& position);
+    void showDatabaseContextMenu(const QPoint& position);
+    void showResultTableContextMenu(const QPoint& position);
     void truncateTable();
     void deleteTable();
     void renameTable();

@@ -20,8 +20,12 @@ public:
     void setDatabase(QSqlDatabase* database);
     QSqlDatabase* getDatabase();
 //    void done(int result) override;
+
+protected:
+    void initializePage(int id);
+
 private:
-    QSqlDatabase* database = NULL;
+    QSqlDatabase* database = nullptr;
 };
 
 #endif // NEWCONNECTIONWIZARD_H

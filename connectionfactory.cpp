@@ -5,17 +5,21 @@
 
 #include <QDebug>
 
+ConnectionFactory::ConnectionFactory(QObject* parent)
+    :parent(parent) {}
+
+
 Connection* ConnectionFactory::create(ConnectionInfo* connectionInfo) {
     // MYSQL Connection
     if ("MYSQL" == connectionInfo->getConnectionType()) {
-        MysqlConnection* connection = new MysqlConnection;
+        MysqlConnection* connection = new MysqlConnection(parent);
         connection->setConnectionInfo(connectionInfo);
         connection->init();
 
         return connection;
     // SQLITE Connection
     } else if ("SQLITE" == connectionInfo->getConnectionType()) {
-        SqliteConnection* connection = new SqliteConnection;
+        SqliteConnection* connection = new SqliteConnection(parent);
         connection->setConnectionInfo(connectionInfo);
         connection->init();
 

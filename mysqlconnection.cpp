@@ -3,6 +3,7 @@
 #include "defaults.h"
 
 #include <QStandardItemModel>
+#include <QSqlRelationalTableModel>
 #include <QGuiApplication>
 #include <QApplication>
 #include <QClipboard>
@@ -15,6 +16,8 @@
 #include <QList>
 #include <QMenu>
 #include <QFont>
+
+#include <QCoreApplication>
 
 #include <QDebug>
 
@@ -130,16 +133,18 @@ void MysqlConnection::collectTableInformations() {
 //    switchDatabase(databaseName);
 }
 
-void MysqlConnection::handleDatabaseContextMenuClicked(const QPoint& position) {
+void MysqlConnection::showDatabaseContextMenu(const QPoint& position) {
     QString clickedItem = this->databaseCollection->data(this->databaseListView->indexAt(position)).toString();
     currentContextMenuItem = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(position));
 
     QMenu menu;
-    QAction actionDeleteTable(tr("Delete Table"));
+//    QAction actionDeleteTable(tr("Delete Table"), this);
+//    QAction actionDeleteTable(parent->tr("Delete Table"), parent);
+    QAction actionDeleteTable(QCoreApplication::translate("MysqlConnection", "Delete Table"), parent);
     menu.addAction(&actionDeleteTable);
-    QAction actionTruncateTable(tr("Truncate Table"));
+    QAction actionTruncateTable(QCoreApplication::translate("MysqlConnection", "Truncate Table"));
     menu.addAction(&actionTruncateTable);
-    QAction actionRenameTable(tr("Rename Table"));
+    QAction actionRenameTable(QCoreApplication::translate("MysqlConnection", "Rename Table"));
     menu.addAction(&actionRenameTable);
 
     connect(&actionTruncateTable, SIGNAL(triggered()), this, SLOT(truncateTable()));
@@ -228,6 +233,7 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     queryResultModel = nullptr;
     delete queryResultModel;
     queryResultModel = new QStandardItemModel;
+//    queryResultModel = new QSqlRelationalTableModel();
 
     database.open();
     QSqlQuery query = sendQuery("SELECT * FROM "+activeTableName);
@@ -256,22 +262,23 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     queryResultView->resizeColumnsToContents();
 }
 
-void MysqlConnection::handleResultTableContextMenuClicked(const QPoint& point) {
+void MysqlConnection::showResultTableContextMenu(const QPoint& point) {
     currentContextMenuItem = this->databaseCollection->itemFromIndex(this->databaseListView->indexAt(point));
     QMenu *menu=new QMenu();
-    QAction copyAction(tr("copy"), this);
+//    QAction copyAction(tr("copy"), this);
+    QAction copyAction(QCoreApplication::translate("MysqlConnection", "copy"));
     connect(&copyAction, SIGNAL(triggered()), this, SLOT(copyResultViewSelection()));
     menu->addAction(&copyAction);
 
-    QAction deleteAction(tr("delete"), this);
+    QAction deleteAction(QCoreApplication::translate("MysqlConnection", "delete"));
     connect(&deleteAction, SIGNAL(triggered()), this, SLOT(deleteResultViewSelection()));
     menu->addAction(&deleteAction);
 
-    QAction pasteAction(tr("paste"), this);
+    QAction pasteAction(QCoreApplication::translate("MysqlConnection", "paste"));
     connect(&pasteAction, SIGNAL(triggered()), this, SLOT(pasteToResultView()));
     menu->addAction(&pasteAction);
 
-    QAction insertNullAction(tr("insert NULL"));
+    QAction insertNullAction(QCoreApplication::translate("MysqlConnection", "insert NULL"));
     connect(&insertNullAction, SIGNAL(triggered()), this, SLOT(insertNullToResultView()));
     menu->addAction(&insertNullAction);
 
@@ -367,15 +374,11 @@ void MysqlConnection::deleteResultViewSelection() {
         return;
     }
 
-    // only one cell selected
-    if (minRow == maxRow
-        && minCol == maxCol
-    ) {
-        emit queryResultModel->layoutAboutToBeChanged();
-        queryResultModel->removeRows(minRow, (maxRow - minRow) + 1);
-        emit queryResultModel->layoutChanged();
-        return;
-    }
+    emit queryResultModel->layoutAboutToBeChanged();
+    queryResultModel->removeRows(minRow, (maxRow - minRow) + 1);
+    emit queryResultModel->layoutChanged();
+
+    return;
 }
 
 void MysqlConnection::pasteToResultView() {

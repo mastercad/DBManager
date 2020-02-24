@@ -5,6 +5,9 @@
 
 #include <QDebug>
 
+Connection::Connection(QObject* parent)
+    :parent(parent) {}
+
 QSqlQuery Connection::sendQuery(QSqlQuery query) {
     QElapsedTimer timer;
     timer.start();

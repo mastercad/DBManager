@@ -55,7 +55,8 @@ void MysqlConnectionEditWidget::deactivateSaveBtn(const QString &text) {
 
 bool MysqlConnectionEditWidget::testConnection() {
     ConnectionInfo* connectionInfo = generateConnectionInfo();
-    ConnectionFactory connectionFactory;
+    QObject* objectFromParent = qobject_cast<QObject*>(parent);
+    ConnectionFactory connectionFactory(objectFromParent);
     Connection* connection = connectionFactory.create(connectionInfo);
 
     bool connectionState = MysqlConnectionValidator::validate(connection);

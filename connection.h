@@ -9,6 +9,7 @@
 #include <QTreeView>
 #include <QTableView>
 #include <QStandardItemModel>
+#include <QSqlRelationalTableModel>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -16,9 +17,10 @@
 #include <QPoint>
 #include <QCompleter>
 
-class Connection : public QObject
+class Connection: public QObject
 {
     Q_OBJECT
+//    Q_DECLARE_TR_FUNCTIONS Connection;
 
 private:
     long lastQueryTime = 0;
@@ -30,6 +32,7 @@ protected:
     QString activeTableName;
     QString activeDatabaseName;
 
+    QObject* parent = nullptr;
     QTreeView* databaseListView = nullptr;
     QTableView* queryResultView = nullptr;
     TextEdit* queryRequestView = nullptr;
@@ -37,11 +40,13 @@ protected:
     QCompleter* completer = nullptr;
     QStandardItemModel* databaseCollection = nullptr;
     QStandardItemModel* queryResultModel = nullptr;
+//    QSqlRelationalTableModel* queryResultModel = nullptr;
 
 signals:
     void connectionError(QString);
 
 public:
+    explicit Connection(QObject* parent);
     ~Connection();
 
     virtual void init() = 0;
@@ -74,8 +79,8 @@ public:
 
 public slots:
     virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
-    virtual void handleDatabaseContextMenuClicked(const QPoint& position) = 0;
-    virtual void handleResultTableContextMenuClicked(const QPoint& position) = 0;
+    virtual void showDatabaseContextMenu(const QPoint& position) = 0;
+    virtual void showResultTableContextMenu(const QPoint& position) = 0;
     virtual void truncateTable() = 0;
     virtual void deleteTable() = 0;
     virtual void renameTable() = 0;
