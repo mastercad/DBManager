@@ -13,6 +13,7 @@ void SqliteConnection::init() {
     database.setDatabaseName(this->getConnectionInfo()->getDatabasePath());
     QFileInfo fileInfo(this->getConnectionInfo()->getDatabasePath());
     activeDatabaseName = fileInfo.baseName();
+    this->getConnectionInfo()->setDatabaseName(activeDatabaseName);
 }
 
 void SqliteConnection::loadDatabaseList() {

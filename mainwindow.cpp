@@ -13,6 +13,7 @@
 #include <QSqlField>
 #include <QToolBar>
 #include <QAction>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QTreeWidgetItem>
 #include <QElapsedTimer>
@@ -53,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->btnQueryExecute->setIcon(executeIcon);
 
     ui->queryResult->setSortingEnabled(true);
+    ui->btnQuerySave->hide();
 
     loadConnectionInfos();
 
@@ -64,6 +66,98 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(createConnectionSubMenu()));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(saveConnectionInfos()));
+    connect(ui->queryRequest, SIGNAL(textChanged()), this, SLOT(handleChangedQueryRequest()));
+    connect(ui->btnQuerySave, SIGNAL(clicked()), this, SLOT(saveQuery()));
+    connect(ui->btnQueryLoad, SIGNAL(clicked()), this, SLOT(loadQuery()));
+}
+
+void MainWindow::handleChangedQueryRequest() {
+    QString query = ui->queryRequest->toPlainText();
+
+    if (!query.isEmpty()
+        && query != this->currentQuery
+    ) {
+        markAsUnsaved(true);
+        showQuerySaveIcon();
+    } else {
+        markAsUnsaved(isUnsaved());
+        hideQuerySaveIcon();
+    }
+}
+
+void MainWindow::showQuerySaveIcon() {
+    ui->btnQuerySave->show();
+}
+
+void MainWindow::hideQuerySaveIcon() {
+    ui->btnQuerySave->hide();
+}
+
+void MainWindow::saveQuery() {
+    QString query = ui->queryRequest->toPlainText();
+    this->currentQuery = query;
+
+    QString queryFileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save Current Query"),
+        "",
+        tr("Sql Files (*.sql);;All Files (*)")
+    );
+
+    if (queryFileName.isEmpty()) {
+        return;
+    } else {
+        qDebug() << "Save in file: " << queryFileName;
+        QFile file(queryFileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(
+                this,
+                tr("Unable to open file"),
+                file.errorString()
+            );
+            return;
+        }
+        QDataStream out(&file);
+        out.setVersion(QDataStream::Qt_4_5);
+        out << query;
+
+        this->currentQuery = query;
+        this->markAsUnsaved(false);
+        this->hideQuerySaveIcon();
+    }
+}
+
+void MainWindow::loadQuery() {
+    QString queryFileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Address Book"),
+        "",
+        tr("Sql Files (*.sql);;All Files (*)")
+    );
+
+    if (queryFileName.isEmpty()) {
+        return;
+    } else {
+        QFile file(queryFileName);
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(
+                this,
+                tr("Unable to open file"),
+                file.errorString()
+            );
+            return;
+        }
+        QString query;
+        QDataStream in(&file);
+        in.setVersion(QDataStream::Qt_4_5);
+        in >> query;
+
+        this->currentQuery = query;
+        hideQuerySaveIcon();
+        markAsUnsaved(false);
+        ui->queryRequest->setText(query);
+    }
 }
 
 void MainWindow::openNewConnectionWindow() {
@@ -290,6 +384,24 @@ void MainWindow::onExecuteQueryClicked() {
 
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {
 
+}
+
+/**
+  Public slot to get unsaved state for global application.
+
+ * @brief MainWindow::markAsUnsaved
+ * @param unsaved
+ */
+void MainWindow::markAsUnsaved(bool unsaved) {
+    this->setUnsaved(unsaved);
+}
+
+bool MainWindow::isUnsaved() const {
+    return unsaved;
+}
+
+void MainWindow::setUnsaved(const bool unsaved) {
+    this->unsaved = unsaved;
 }
 
 MainWindow::~MainWindow() {

@@ -395,3 +395,5 @@ lupdate DBManager.pro
 # qm datei erstellen:
 lrelease DBManager.pro
 
+# build mysql driver unter windows:
+qmake "INCLUDEPATH+=E:\Qt\mysql\include" "LIBS+=E:\Qt\mysql\lib\opt\libmysqlcpp.lib" -o Makefile mysql.pro

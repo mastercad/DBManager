@@ -37,6 +37,10 @@ public slots:
     void createConnectionSubMenu();
     void saveConnectionInfos();
     void handleConnectionError(QString errorMessage);
+    void handleChangedQueryRequest();
+    void markAsUnsaved(bool);
+    void saveQuery();
+    void loadQuery();
 
 private:
     Ui::MainWindow *ui;
@@ -47,6 +51,11 @@ private:
     void collectTableInformations();
     void storeConnectionInfo(ConnectionInfo* connectionInfo);
     void loadConnectionInfos();
+    bool isUnsaved() const;
+    void setUnsaved(const bool);
+    void showQuerySaveIcon();
+    void hideQuerySaveIcon();
+    QString currentQuery = "";
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
     QString generateLastExecutedQuery(const QSqlQuery& query);
@@ -58,6 +67,7 @@ private:
 
     QString activeDatabase;
     QString activeTable;
+    bool unsaved = false;
 
     ConnectionFactory* connectionFactory = nullptr;
     ConnectionInfoFactory* connectionInfoFactory = nullptr;

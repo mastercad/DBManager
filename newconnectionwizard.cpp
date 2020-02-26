@@ -21,6 +21,9 @@ NewConnectionWizard::NewConnectionWizard(QWidget* parent)
 #endif
 
     setWindowTitle(tr("New Connection-Wizard"));
+    int width = 600, height = 400;
+
+    resize(width, height);
 /*
     QWidget * sideWidget = new QWidget();
     QGridLayout * gridLayout = new QGridLayout();

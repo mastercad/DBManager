@@ -35,7 +35,41 @@
        <widget class="TextEdit" name="queryRequest"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,7">
+        <item>
+         <widget class="QPushButton" name="btnQuerySave">
+          <property name="text">
+           <string>Save</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/speichern_schatten.png</normaloff>:/icons/speichern_schatten.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnQueryLoad">
+          <property name="text">
+           <string>Load</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/speichern_schatten.png</normaloff>:/icons/speichern_schatten.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QPushButton" name="btnQueryExecute">
           <property name="locale">
@@ -47,6 +81,12 @@
           <property name="icon">
            <iconset resource="resources.qrc">
             <normaloff>:/icons/ausfuehren_schatten.png</normaloff>:/icons/ausfuehren_schatten.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
           </property>
          </widget>
         </item>

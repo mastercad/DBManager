@@ -6,7 +6,7 @@
 
 QT       += core gui sql
 
-CONFIG -= import_plugins
+#CONFIG -= import_plugins
 CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -25,12 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-LIBS    += -lGL
-LIBS    += -L/usr/local/lib -L/usr/lib -lmysqlcppconn
+# LIBS    += -lGL
+LIBS    += -L/usr/local/lib -L/usr/lib -L"D:\Programme\Qt\5.12.6\mingw73_64\lib" -L"C:\Program Files\MySQL\MySQL Connector C++ 1.0.5/lib/opt" -lmysqlcppconn
 #LIBS    += -L/media/Austausch/Qt/5.15_static/lib -lmysqlcppconn
 
-INCLUDEPATH += -I/usr/include -I/usr/local/include -I/usr/local/include/cppconn
+INCLUDEPATH += -I/usr/include -I/usr/local/include -I/usr/local/include/cppconn -I"D:\Programme\Qt\5.12.6\mingw73_64\include" -I"C:\Program Files\MySQL\MySQL Connector C++ 1.0.5\include"
 #INCLUDEPATH += -I/media/Austausch/Qt/5.15_static/include -I/usr/local/include/cppconn
+
+QT_PLUGIN_PATH=`pwd`
 
 SOURCES += \
     main.cpp \

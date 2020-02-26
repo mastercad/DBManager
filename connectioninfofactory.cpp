@@ -83,7 +83,6 @@ ConnectionInfo* ConnectionInfoFactory::create(NewConnectionWizard& wizard) {
 //        SqliteConnectionInfo* connectionInfo = new SqliteConnectionInfo();
         ConnectionInfo* connectionInfo = new ConnectionInfo();
         connectionInfo->setDatabasePath(wizard.field("sqlite.path").toString());
-//        connectionInfo->setDatabaseName(wizard.field("sqlite.path").toString());
         connectionInfo->setConnectionType("SQLITE");
         connectionInfo->setConnectionName(!wizard.field("sqlite.connection.name").toString().isEmpty() ? wizard.field("mysql.connection.name").toString() : generateNewConnectionName(connectionInfo));
 
