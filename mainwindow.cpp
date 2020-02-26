@@ -26,6 +26,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QFile>
+#include <QToolButton>
 
 #include <QDebug>
 
@@ -55,6 +56,26 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->queryResult->setSortingEnabled(true);
     ui->btnQuerySave->hide();
+/*
+    QToolButton *tb = new QToolButton();
+    tb->setText("+");
+    // Add empty, not enabled tab to tabWidget
+    ui->tabWidget->addTab(new QLabel("Add tabs by pressing \"+\""), QString());
+    ui->tabWidget->setTabEnabled(0, false);
+    // Add tab button to current tab. Button will be enabled, but tab -- not
+    ui->tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, tb);
+*/
+    ui->setupUi(this);
+    ui->tabWidget->clear();
+    ui->tabWidget->addTab(new QLabel(""), QString("+"));
+    ui->tabWidget->setTabsClosable(true);
+//    ui->tabWidget->addTab(new QLabel(""), QPushButton("+"));
+    auto tabBar = ui->tabWidget->tabBar();
+    tabBar->tabButton(0, QTabBar::RightSide)->hide();
+
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onChangeTab(int)));
+    connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    newTab();
 
     loadConnectionInfos();
 
@@ -66,13 +87,45 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->menuVerbinden, SIGNAL(triggered(QAction*)), this, SLOT(onEstablishNewConnection(QAction*)));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(createConnectionSubMenu()));
     connect(&this->connections, SIGNAL(changed()), this, SLOT(saveConnectionInfos()));
-    connect(ui->queryRequest, SIGNAL(textChanged()), this, SLOT(handleChangedQueryRequest()));
     connect(ui->btnQuerySave, SIGNAL(clicked()), this, SLOT(saveQuery()));
     connect(ui->btnQueryLoad, SIGNAL(clicked()), this, SLOT(loadQuery()));
 }
 
+void MainWindow::onChangeTab(int index) {
+    if (index == this->ui->tabWidget->count() - 1) {
+        newTab();
+    } else {
+        this->currentTabIndex = index;
+    }
+}
+
+void MainWindow::closeTab(int index) {
+    if (index < this->ui->tabWidget->count() -1) {
+        qDebug() << "Close requested on " << index;
+        this->ui->tabWidget->removeTab(index);
+        this->currentTabIndex = this->currentTabIndex - 1;
+    }
+}
+
+void MainWindow::newTab() {
+    int position = ui->tabWidget->count() - 1;
+
+    TextEdit* textEdit = new TextEdit();
+    connect(textEdit, SIGNAL(textChanged()), this, SLOT(handleChangedQueryRequest()));
+    ui->tabWidget->insertTab(position, textEdit, QString(tr("New tab")));
+    ui->tabWidget->setCurrentIndex(position);
+//    auto tabBar = ui->tabWidget->tabBar();
+//    tabBar->scroll(tabBar->width(), 0);
+//    tabBar->setTabsClosable(true);
+
+//    for (int currentIndex = 0; currentIndex < ui->tabWidget->count(); ++currentIndex) {
+//    }
+}
+
 void MainWindow::handleChangedQueryRequest() {
-    QString query = ui->queryRequest->toPlainText();
+//    QString query = ui->queryRequest->toPlainText();
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    QString query = textEdit->toPlainText();
 
     if (!query.isEmpty()
         && query != this->currentQuery
@@ -94,7 +147,8 @@ void MainWindow::hideQuerySaveIcon() {
 }
 
 void MainWindow::saveQuery() {
-    QString query = ui->queryRequest->toPlainText();
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    QString query = textEdit->toPlainText();
     this->currentQuery = query;
 
     QString queryFileName = QFileDialog::getSaveFileName(
@@ -156,7 +210,9 @@ void MainWindow::loadQuery() {
         this->currentQuery = query;
         hideQuerySaveIcon();
         markAsUnsaved(false);
-        ui->queryRequest->setText(query);
+        TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+        textEdit->setText(query);
+//        ui->queryRequest->setText(query);
     }
 }
 
@@ -329,7 +385,9 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
 
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
-    dbConnection->setQueryRequestView(ui->queryRequest);
+//    dbConnection->setQueryRequestView(ui->queryRequest);
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    dbConnection->setQueryRequestView(textEdit);
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
 
@@ -347,7 +405,9 @@ void MainWindow::handleConnectionError(QString errorMessage) {
 }
 
 void MainWindow::onExecuteQueryClicked() {
-    QString queryString = ui->queryRequest->toPlainText();
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    QString queryString = textEdit->toPlainText();
+//    QString queryString = ui->queryRequest->toPlainText();
 
     if (nullptr == dbConnection) {
         this->ui->information->append(tr("No Connection established!"));

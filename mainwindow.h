@@ -41,6 +41,8 @@ public slots:
     void markAsUnsaved(bool);
     void saveQuery();
     void loadQuery();
+    void onChangeTab(int);
+    void closeTab(int);
 
 private:
     Ui::MainWindow *ui;
@@ -55,6 +57,8 @@ private:
     void setUnsaved(const bool);
     void showQuerySaveIcon();
     void hideQuerySaveIcon();
+    void newTab();
+
     QString currentQuery = "";
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
@@ -68,6 +72,7 @@ private:
     QString activeDatabase;
     QString activeTable;
     bool unsaved = false;
+    int currentTabIndex = 0;
 
     ConnectionFactory* connectionFactory = nullptr;
     ConnectionInfoFactory* connectionInfoFactory = nullptr;
