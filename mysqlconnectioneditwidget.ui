@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>489</width>
-    <height>290</height>
+    <width>600</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,4,1,1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,7,1,1">
        <item>
         <widget class="QLabel" name="hostLabel">
          <property name="text">

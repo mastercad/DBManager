@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     mainWindow.setWindowIcon(QIcon(":/icons/programm_icon.png"));
     mainWindow.show();
 
-    qDebug() << QLocale::system().name();
+//    qDebug() << QLocale::system().name();
 
     return application.exec();
 }

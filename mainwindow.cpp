@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->queryResult->setSortingEnabled(true);
     ui->btnQuerySave->hide();
 
+    this->currentQueryRequests = new QMap<int, QString>;
+
 /*
     QToolButton *tb = new QToolButton();
     tb->setText("+");
@@ -107,10 +109,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionCheckForUpdates, SIGNAL(triggered()), this, SLOT(checkUpdateAvailable()));
 
-    checkUpdateAvailable();
+    checkUpdateAvailable(false);
 }
 
-void MainWindow::checkUpdateAvailable() {
+void MainWindow::checkUpdateAvailable(bool manualTriggered) {
+    this->updateManualExecuted = manualTriggered;
     QNetworkRequest request(Application::UpdateUrl);
     this->networkManager.get(request);
 }
@@ -168,6 +171,8 @@ void MainWindow::handleUpdateInformationDownload(QNetworkReply* reply) {
             lastElementName = xmlReader.name().toString();
         }
     }
+
+    // Update possible
     if (xmlBuildNo > Application::BuildNo) {
         QMessageBox updateInformation;
 
@@ -213,8 +218,8 @@ void MainWindow::handleUpdateInformationDownload(QNetworkReply* reply) {
                 ) {
                     fileList.append(elementContent);
                     maximumFileSize += fileSize;
-                    qDebug() << "Habe FileSize: " << fileSize;
-                    qDebug() << "Maximum ist jetzt: " << maximumFileSize;
+//                    qDebug() << "Habe FileSize: " << fileSize;
+//                    qDebug() << "Maximum ist jetzt: " << maximumFileSize;
                     fileSize = 0;
                 }
 
@@ -231,7 +236,7 @@ void MainWindow::handleUpdateInformationDownload(QNetworkReply* reply) {
                 }
             }
 
-            qDebug() << fileList;
+//            qDebug() << fileList;
             QString updateTargetDirectoryPathName = "update";
             QDir updateTargetDirectory(updateTargetDirectoryPathName);
 //            QDir updateTargetDirectory(QCoreApplication::applicationDirPath()+"/../");
@@ -254,17 +259,23 @@ void MainWindow::handleUpdateInformationDownload(QNetworkReply* reply) {
 //            progressDialogUpdate->setRange(0, fileList.size());
             progressDialogUpdate->show();
 
-            qDebug() << "MaximumFileSize: " << maximumFileSize;
+//            qDebug() << "MaximumFileSize: " << maximumFileSize;
 
             for (QString file : fileList) {
                 FileDownloader* fileDownloader = new FileDownloader(this);
                 fileDownloader->setTargetPathName(updateTargetDirectory.absolutePath()+"/"+file);
-                qDebug() << file;
+//                qDebug() << file;
                 fileDownloader->download(file);
                 this->fileDownloaderCollection.append(fileDownloader);
 //                fileDownloader->deleteLater();
             }
         }
+    } else if (true == this->updateManualExecuted) {
+        QMessageBox::information(
+            this,
+            tr("DBManager already on newest version!"),
+            tr("Your version of DBManager is already up to date with %1").arg(Application::BuildNo)
+        );
     }
 }
 
@@ -273,7 +284,7 @@ void MainWindow::adjustProgressValue(int value) {
 }
 
 void MainWindow::updateFileFinished(QNetworkReply* reply) {
-    qDebug() << "Finished!";
+//    qDebug() << "Finished!";
 /*
     // Path of startup source to execute (/home/user)
     qDebug() << "WorkingDir: " << QDir::currentPath();
@@ -289,7 +300,7 @@ void MainWindow::updateFileFinished(QNetworkReply* reply) {
     QDir dir(".");
     qDebug() << "./: " << dir.absolutePath();
 */
-    qDebug() << "Progressbar Value in Finished: " << progressDialogUpdate->value();
+//    qDebug() << "Progressbar Value in Finished: " << progressDialogUpdate->value();
 
     bool allFileDownloaderSucceed = true;
     int finishedDownloads = 0;
@@ -304,7 +315,7 @@ void MainWindow::updateFileFinished(QNetworkReply* reply) {
 
     progressDialogUpdate->setValue(finishedDownloads);
 
-    qDebug() << "All FileDownloader Succeed?: " << allFileDownloaderSucceed;
+//    qDebug() << "All FileDownloader Succeed?: " << allFileDownloaderSucceed;
 
     if (allFileDownloaderSucceed) {
         QMessageBox messageBox;
@@ -324,18 +335,18 @@ void MainWindow::updateFileFinished(QNetworkReply* reply) {
 
             if (QFileInfo::exists(shellScriptPath)) {
                 if (!QProcess::startDetached("/bin/sh", QStringList{shellScriptPath})) {
-                    qDebug() << "Failes to restart application!";
+                    qWarning() << "Failes to restart application!";
                 } else {
                     QCoreApplication::quit();
                 }
             } else if (QFileInfo::exists(executablePath)) {
                 if (!QProcess::startDetached(executablePath)) {
-                    qDebug() << "Failes to restart application!";
+                    qWarning() << "Failes to restart application!";
                 } else {
                     QCoreApplication::quit();
                 }
             } else {
-                qDebug() << "Run Script not found! Automatic restart not possible";
+                qWarning() << "Run Script not found! Automatic restart not possible";
             }
         }
         progressDialogUpdate->hide();
@@ -344,25 +355,24 @@ void MainWindow::updateFileFinished(QNetworkReply* reply) {
 }
 
 void MainWindow::updateError(QNetworkReply::NetworkError error) {
-    qDebug() << "UpdateError" << error;
+    qCritical() << "UpdateError" << error;
 }
 
 void MainWindow::updateUpdateProgress(qint64 bytesRead, qint64 totalBytes) {
-    qDebug() << "updateUpdateProgress: " << bytesRead << " von " << totalBytes;
+//    qDebug() << "updateUpdateProgress: " << bytesRead << " von " << totalBytes;
     progressDialogUpdate->setValue(progressDialogUpdate->value() + bytesRead);
 //    progressDialogUpdate->setValue(progressDialogUpdate->value()+1);
 }
 
 void MainWindow::updateCanceled() {
-    qDebug() << "Update Canceled!";
-
+//    qDebug() << "Update Canceled!";
     for (FileDownloader* fileDownloader : fileDownloaderCollection) {
         fileDownloader->abort();
     }
 }
 
 void MainWindow::updateTimedOut() {
-    qDebug() << "Update TimedOut!";
+//    qDebug() << "Update TimedOut!";
 }
 
 void MainWindow::onChangeTab(int index) {
@@ -370,7 +380,7 @@ void MainWindow::onChangeTab(int index) {
     if (index == this->ui->tabWidget->count() - 1) {
         newTab();
     } else {
-        this->currentTabIndex = index;
+//        this->currentTabIndex = index;
         this->handleChangedQueryRequest();
     }
 }
@@ -383,18 +393,30 @@ void MainWindow::closeTab(int index) {
         && index < (this->ui->tabWidget->count() - 1)
     ) {
         this->ui->tabWidget->removeTab(index);
-        this->currentTabIndex = this->currentTabIndex - 1;
+//        this->currentTabIndex = this->currentTabIndex - 1;
 
-        if (this->currentQueryRequests.contains(index)) {
-            this->currentQueryRequests.remove(this->currentTabIndex);
+        if (this->currentQueryRequests->contains(index)) {
+//            this->currentQueryRequests->remove(this->currentTabIndex);
+            this->currentQueryRequests->remove(ui->tabWidget->currentIndex());
         }
+
+        // reindex map
+        QMap<int, QString>* newMap = new QMap<int, QString>();
+        QMapIterator<int, QString> mapIterator(*this->currentQueryRequests);
+        int index = 0;
+        while (mapIterator.hasNext()) {
+            mapIterator.next();
+            (*newMap)[index] = mapIterator.value();
+            index++;
+        }
+        this->currentQueryRequests = newMap;
     }
 }
 
 void MainWindow::newTab() {
     int position = ui->tabWidget->count() - 1;
 
-    TextEdit* textEdit = new TextEdit();
+    TextEdit* textEdit = new TextEdit(this);
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(handleChangedQueryRequest()));
 
     ui->tabWidget->insertTab(position, textEdit, QString(tr("New tab")));
@@ -403,13 +425,20 @@ void MainWindow::newTab() {
 
 void MainWindow::handleChangedQueryRequest() {
 //    QString query = ui->queryRequest->toPlainText();
-    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+//    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
     QString query = textEdit->toPlainText();
 
+//    if (!query.isEmpty()
+//        && ((this->currentQueryRequests->contains(this->currentTabIndex)
+//            && query != (*this->currentQueryRequests)[this->currentTabIndex])
+//            || false == this->currentQueryRequests->contains(this->currentTabIndex)
+//        )
+//    ) {
     if (!query.isEmpty()
-        && ((this->currentQueryRequests.contains(this->currentTabIndex)
-            && query != this->currentQueryRequests[this->currentTabIndex])
-            || false == this->currentQueryRequests.contains(this->currentTabIndex)
+        && ((this->currentQueryRequests->contains(this->ui->tabWidget->currentIndex())
+            && query != (*this->currentQueryRequests)[this->ui->tabWidget->currentIndex()])
+            || false == this->currentQueryRequests->contains(this->ui->tabWidget->currentIndex())
         )
     ) {
         markAsUnsaved(true);
@@ -429,7 +458,8 @@ void MainWindow::hideQuerySaveIcon() {
 }
 
 void MainWindow::saveQuery() {
-    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+//    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
     QString query = textEdit->toPlainText();
 
     QString queryFileName = QFileDialog::getSaveFileName(
@@ -442,7 +472,7 @@ void MainWindow::saveQuery() {
     if (queryFileName.isEmpty()) {
         return;
     } else {
-        qDebug() << "Save in file: " << queryFileName;
+//        qDebug() << "Save in file: " << queryFileName;
         QFile file(queryFileName);
         if (!file.open(QIODevice::WriteOnly)) {
             QMessageBox::information(
@@ -456,7 +486,8 @@ void MainWindow::saveQuery() {
         out.setVersion(QDataStream::Qt_4_5);
         out << query;
 
-        this->currentQueryRequests[this->currentTabIndex] = query;
+//        (*this->currentQueryRequests)[this->currentTabIndex] = query;
+        (*this->currentQueryRequests)[this->ui->tabWidget->currentIndex()] = query;
         this->markAsUnsaved(false);
         this->hideQuerySaveIcon();
     }
@@ -488,10 +519,12 @@ void MainWindow::loadQuery() {
         in.setVersion(QDataStream::Qt_4_5);
         in >> query;
 
-        this->currentQueryRequests[this->currentTabIndex] = query;
+//        (*this->currentQueryRequests)[this->currentTabIndex] = query;
+        (*this->currentQueryRequests)[this->ui->tabWidget->currentIndex()] = query;
         hideQuerySaveIcon();
         markAsUnsaved(false);
-        TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+//        TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+        TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
         textEdit->setText(query);
     }
 }
@@ -536,7 +569,6 @@ void MainWindow::createConnectionSubMenu() {
     }
 
     if (0 < connections.size()) {
-        qDebug() << "SHOW CONNECTIONS MENU!" << " SIZE: " << connections.size();
         ui->menuVerbinden->menuAction()->setVisible(true);
     }
 }
@@ -676,7 +708,8 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
 //    dbConnection->setQueryRequestView(ui->queryRequest);
-    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+//    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
     dbConnection->setQueryRequestView(textEdit);
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
@@ -690,12 +723,23 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     return dbConnection;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Return && event->modifiers() == Qt::ControlModifier) {
+        this->onExecuteQueryClicked();
+    }
+}
+
 void MainWindow::handleConnectionError(QString errorMessage) {
     this->ui->information->append(errorMessage);
 }
 
 void MainWindow::onExecuteQueryClicked() {
-    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
+//    qDebug() << "Current Tab Index von QTabWidget::currentIndex: " << ui->tabWidget->currentIndex();
+
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(ui->tabWidget->currentIndex()));
+
+//    qDebug() << "MainWindow::onExecuteQueryClicked textEdit: " << textEdit;
+
     QString queryString = textEdit->toPlainText();
 //    QString queryString = ui->queryRequest->toPlainText();
 
@@ -709,7 +753,7 @@ void MainWindow::onExecuteQueryClicked() {
 
     if (query.isActive()) {
         QSqlRecord localRecord = query.record();
-        qDebug() << "Local Record: " << localRecord;
+//        qDebug() << "Local Record: " << localRecord;
         for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
             QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
             queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
@@ -760,7 +804,7 @@ void MainWindow::showAboutText() {
     messageBox.setWindowTitle(tr("DBManager - about"));
     messageBox.setTextFormat(Qt::RichText);
     messageBox.setText(tr("DBManager in version %1.<br />This Program is Freeware and OpenSource.").arg(Application::BuildNo));
-    messageBox.setInformativeText(tr("Future information and Projects under <a href='https://www.byte-artist.de'>www.byte-artist.de</a>"));
+    messageBox.setInformativeText(tr("Future information and Projects under <a href='https://www.byte-artist.de'>www.byte-artist.de</a><br /><br />Found issues can tracked here: <a href='https://bitbucket.org/mastercad/dbmanager/issues'>DBManager Issue Tracker</a>"));
 
     messageBox.exec();
 }
@@ -768,6 +812,7 @@ void MainWindow::showAboutText() {
 MainWindow::~MainWindow() {
     delete ui;
     delete progressDialogUpdate;
+    delete currentQueryRequests;
 
     for (FileDownloader* fileDownloader : this->fileDownloaderCollection) {
         delete fileDownloader;

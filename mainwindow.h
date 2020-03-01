@@ -16,6 +16,7 @@
 #include <QCompleter>
 #include <QNetworkReply>
 #include <QProgressDialog>
+#include <QKeyEvent>
 #include <QPoint>
 #include <QList>
 
@@ -49,7 +50,7 @@ public slots:
     void loadQuery();
     void onChangeTab(int);
     void closeTab(int);
-    void checkUpdateAvailable();
+    void checkUpdateAvailable(bool manualTriggered = true);
     void updateCanceled();
     void updateTimedOut();
     void updateUpdateProgress(qint64 current, qint64 max);
@@ -72,6 +73,7 @@ private:
     void showQuerySaveIcon();
     void hideQuerySaveIcon();
     void newTab();
+    void keyPressEvent(QKeyEvent* event);
 
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
@@ -95,7 +97,8 @@ private:
 
 //    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
     Connections connections;
-    QMap<int, QString> currentQueryRequests;
+    bool updateManualExecuted = true;
+    QMap<int, QString>* currentQueryRequests = nullptr;
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = nullptr;

@@ -48,6 +48,32 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     passwordEdit->setEchoMode(QLineEdit::Password);
     passwordEdit->setPlaceholderText(Defaults::MYSQL::PASSWORD);
 
+    QHBoxLayout* hostNameContainer = new QHBoxLayout;
+
+    QSizePolicy sizePolicityHostLabel(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    sizePolicityHostLabel.setHorizontalStretch(3);
+    hostLabel->setSizePolicy(sizePolicityHostLabel);
+
+    hostNameContainer->addWidget(hostLabel);
+
+    QSizePolicy sizePolicityHostEdit(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    sizePolicityHostEdit.setHorizontalStretch(6);
+    hostEdit->setSizePolicy(sizePolicityHostEdit);
+
+    hostNameContainer->addWidget(hostEdit);
+
+    QSizePolicy sizePolicityPortLabel(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    sizePolicityPortLabel.setHorizontalStretch(1);
+    portLabel->setSizePolicy(sizePolicityPortLabel);
+
+    hostNameContainer->addWidget(portLabel);
+
+    QSizePolicy sizePolicityPortEdit(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    sizePolicityPortEdit.setHorizontalStretch(2);
+    portEdit->setSizePolicy(sizePolicityPortEdit);
+
+    hostNameContainer->addWidget(portEdit);
+
     mysqlConnectionValidEdit = new QLineEdit;
     mysqlConnectionValidEdit->setText("NO");
 
@@ -61,10 +87,11 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     QGridLayout* layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0, 1, 1);
     layout->addWidget(nameEdit, 0, 1, 1, 3);
-    layout->addWidget(hostLabel, 1, 0, 1, 1);
-    layout->addWidget(hostEdit, 1, 1, 1, 1);
-    layout->addWidget(portLabel, 1, 2, 1, 1);
-    layout->addWidget(portEdit, 1, 3, 1, 1);
+//    layout->addWidget(hostLabel, 1, 0, 1, 1);
+//    layout->addWidget(hostEdit, 1, 1, 1, 4);
+//    layout->addWidget(portLabel, 1, 2, 1, 1);
+//    layout->addWidget(portEdit, 1, 3, 1, 1);
+    layout->addLayout(hostNameContainer, 1, 0, 1, 4);
     layout->addWidget(userLabel, 2, 0, 1, 1);
     layout->addWidget(userEdit, 2, 1, 1, 3);
     layout->addWidget(passwordLabel, 3, 0, 1, 1);
@@ -97,7 +124,7 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
 }
 
 void ConnectionWizardMysqlPage::initializePage() {
-    qDebug() << "INIT ConnectionWizardMysqlPage!";
+//    qDebug() << "INIT ConnectionWizardMysqlPage!";
     wizard()->button(QWizard::NextButton)->setVisible(false);
     wizard()->button(QWizard::NextButton)->setEnabled(false);
     wizard()->button(QWizard::FinishButton)->setEnabled(false);

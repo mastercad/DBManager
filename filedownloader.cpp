@@ -21,7 +21,7 @@ void FileDownloader::download(QString file) {
     QString downloadUrl = Application::UpdateDonwloadUrl+file;
 //    connect(timer, SIGNAL(timeout()), mainWindow, SLOT(updateTimedOut()));
     timer->start(0);
-    qDebug() << "Download " << downloadUrl;
+//    qDebug() << "Download " << downloadUrl;
     networkManager = new QNetworkAccessManager(this);
     QNetworkRequest request(downloadUrl);
     reply = networkManager->get(request);
@@ -62,13 +62,13 @@ void FileDownloader::finished(QNetworkReply* reply) {
         connect(this->reply, SIGNAL(downloadProgress(qint64, qint64)), mainWindow, SLOT(updateUpdateProgress(qint64, qint64)));
         connect(this->reply, SIGNAL(error(QNetworkReply::NetworkError)), mainWindow, SLOT(updateError(QNetworkReply::NetworkError)));
 
-        qDebug() << "Redirect Download!";
+//        qDebug() << "Redirect Download!";
 //        runningreplies.insert(std::make_pair(reply, id));
         return;
     }
 
     QString filePathName = QFileInfo(this->targetPathName).absolutePath();
-    qDebug() << "TargetPath: " << filePathName;
+//    qDebug() << "TargetPath: " << filePathName;
     // ensure filepath exists
     QDir().mkpath(filePathName);
 
@@ -77,7 +77,7 @@ void FileDownloader::finished(QNetworkReply* reply) {
     file.write(this->reply->readAll());
     file.close();
 
-    qDebug() << "FileDownloader::finished!";
+//    qDebug() << "FileDownloader::finished!";
     this->downloadFinished = true;
 }
 

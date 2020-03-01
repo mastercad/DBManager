@@ -62,11 +62,17 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,7">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1,8">
         <item>
          <widget class="QPushButton" name="btnQuerySave">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press &lt;span style=&quot; font-weight:600;&quot;&gt;Button&lt;/span&gt; to Save Query to File&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
-           <string>Save</string>
+           <string>&amp;Save</string>
           </property>
           <property name="icon">
            <iconset resource="resources.qrc">
@@ -77,13 +83,25 @@
             <width>24</width>
             <height>24</height>
            </size>
+          </property>
+          <property name="shortcut">
+           <string>Alt+S</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnQueryLoad">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press &lt;span style=&quot; font-weight:600;&quot;&gt;Button&lt;/span&gt; to load Query from File&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="locale">
+           <locale language="English" country="UnitedKingdom"/>
+          </property>
           <property name="text">
-           <string>Load</string>
+           <string>&amp;Load</string>
           </property>
           <property name="icon">
            <iconset resource="resources.qrc">
@@ -95,15 +113,36 @@
             <height>24</height>
            </size>
           </property>
+          <property name="shortcut">
+           <string>Alt+L</string>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnQueryExecute">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::NoContextMenu</enum>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press &lt;span style=&quot; font-weight:600;&quot;&gt;Button&lt;/span&gt; or &lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+Return&lt;/span&gt; to execute Query&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="accessibleDescription">
+           <string/>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
           <property name="locale">
            <locale language="English" country="UnitedKingdom"/>
           </property>
+          <property name="inputMethodHints">
+           <set>Qt::ImhNone</set>
+          </property>
           <property name="text">
-           <string>Execute</string>
+           <string>&amp;Execute</string>
           </property>
           <property name="icon">
            <iconset resource="resources.qrc">
@@ -114,6 +153,18 @@
             <width>24</width>
             <height>24</height>
            </size>
+          </property>
+          <property name="shortcut">
+           <string>Alt+E, Ctrl+Return</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -126,6 +177,18 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedKingdom"/>
         </property>
        </widget>
       </item>
@@ -154,6 +217,9 @@
      <string>Connections</string>
     </property>
     <widget class="QMenu" name="menuVerbinden">
+     <property name="toolTip">
+      <string>Select Connection and press to Connect</string>
+     </property>
      <property name="title">
       <string>Connect</string>
      </property>
@@ -198,15 +264,24 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="toolTip">
+    <string>Click Entry to create new Connection</string>
+   </property>
   </action>
   <action name="actionEditConnection">
    <property name="text">
     <string>Manager</string>
    </property>
+   <property name="toolTip">
+    <string>Click Entry to edit Connections</string>
+   </property>
   </action>
   <action name="actionClose">
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Click Entry to close</string>
    </property>
   </action>
   <action name="actionSubmenu">
@@ -222,10 +297,16 @@
    <property name="text">
     <string>about DBManager</string>
    </property>
+   <property name="toolTip">
+    <string>Click Entry to show Information about DBManager</string>
+   </property>
   </action>
   <action name="actionCheckForUpdates">
    <property name="text">
     <string>check for Updates</string>
+   </property>
+   <property name="toolTip">
+    <string>Click Entry to check for new updates for DBManager</string>
    </property>
   </action>
  </widget>

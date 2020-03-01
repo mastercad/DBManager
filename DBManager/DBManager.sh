@@ -11,8 +11,8 @@ export QT_QPA_PLATFORM_PLUGIN_PATH="$BASE_DIR"/plugins/platforms:QT_QPA_PLATFORM
 absPath=$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )
 updatePath="${absPath}/update/";
 
-echo "Absolute Path: $absPath"
-echo "Update Path: $updatePath"
+#echo "Absolute Path: $absPath"
+#echo "Update Path: $updatePath"
 
 moveUpdateFiles() {
 	for file in $( find "${updatePath}" ); do
