@@ -4,35 +4,11 @@
     <Update>
       <Application>
           <BuildNo>
-              1.0.2
+              0.0.9
           </BuildNo>
       </Application>
       <Files>
-          <File size="498000">
-              <![CDATA[DBManager.tar.gz]]>
-          </File>
-      </Files>
-    </Update>
-    <Update>
-      <Application>
-          <BuildNo>
-              1.0.1
-          </BuildNo>
-      </Application>
-      <Files>
-          <File size="498000">
-              <![CDATA[DBManager.tar.gz]]>
-          </File>
-      </Files>
-    </Update>
-    <Update>
-      <Application>
-          <BuildNo>
-              1.0.0
-          </BuildNo>
-      </Application>
-      <Files>
-          <File size="498000">
+          <File size="498003">
               <![CDATA[DBManager.tar.gz]]>
           </File>
       </Files>
