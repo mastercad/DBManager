@@ -17,22 +17,23 @@ echo "Update Path: $updatePath"
 moveUpdateFiles() {
 	for file in $( find "${updatePath}" ); do
 		if [ $file != $updatePath ] && [ -f $file ]; then
-			dirName=`dirname $file`
-			fileName=`basename $file`
-			relativeFilePath=`realpath --relative-to=$updatePath $file`
-			relativeDirPath=`realpath --relative-to=$updatePath $dirName`
-			echo "Relative Path: $relativeFilePath"
-			echo "Dirname: $dirName"
-			echo "Relative Dirname: $relativeDirPath"
-			echo "Basename: $fileName"
+#			dirName=`dirname $file`
+#			fileName=`basename $file`
+#			relativeFilePath=`realpath --relative-to=$updatePath $file`
+#			relativeDirPath=`realpath --relative-to=$updatePath $dirName`
+#			echo "Relative Path: $relativeFilePath"
+#			echo "Dirname: $dirName"
+#			echo "Relative Dirname: $relativeDirPath"
+#			echo "Basename: $fileName"
 			
-			if [ ! -d "${absPath}/${relativeDirPath}" ]; then
-				mkdir -r "${absPath}/${relativeDirPath}"
-			fi
-			echo "Verschiebe nach $absPath/$relativeDirPath"
-			echo "Verschoben werden würde $absPath/$relativeFilePath"
+#			if [ ! -d "${absPath}/${relativeDirPath}" ]; then
+#				mkdir -r "${absPath}/${relativeDirPath}"
+#			fi
+#			echo "Verschiebe nach $absPath/$relativeDirPath"
+#			echo "Verschoben werden würde $absPath/$relativeFilePath"
 			
-			mv "${file}" "${absPath}/${relativeFilePath}"
+#			mv "${file}" "${absPath}/${relativeFilePath}"
+			tar xfvz "${file}" --directory "${absPath}"
 		fi
 	done
 	
@@ -44,4 +45,4 @@ if [ -d "${updatePath}" ] && [ ! -z "$(ls -A "${updatePath}")" ]; then
 fi
 
 
-#"$BASE_DIR"/bin/DBManager "$@"
+"$BASE_DIR"/bin/DBManager "$@"

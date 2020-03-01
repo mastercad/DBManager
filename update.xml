@@ -8,14 +8,8 @@
           </BuildNo>
       </Application>
       <Files>
-          <File size="787214">
-              <![CDATA[bin/DBManager]]>
-          </File>
-          <File size="3876224">
-              <![CDATA[lib/libmysqlclient.so.20]]>
-          </File>
-          <File size="77536">
-              <![CDATA[bin/sqldrivers/libqsqlmysql.so]]>
+          <File size="498000">
+              <![CDATA[DBManager.tar.gz]]>
           </File>
       </Files>
     </Update>
@@ -26,11 +20,8 @@
           </BuildNo>
       </Application>
       <Files>
-          <File size="3876224">
-              <![CDATA[lib/libmysqlclient.so.20]]>
-          </File>
-          <File size="26904264">
-              <![CDATA[lib/libicudata.so.60]]>
+          <File size="498000">
+              <![CDATA[DBManager.tar.gz]]>
           </File>
       </Files>
     </Update>
@@ -41,17 +32,8 @@
           </BuildNo>
       </Application>
       <Files>
-          <File size="767336">
-              <![CDATA[bin/DBManager]]>
-          </File>
-          <File size="3876224">
-              <![CDATA[lib/libmysqlclient.so.20]]>
-          </File>
-          <File size="26904264">
-              <![CDATA[lib/libicudata.so.60]]>
-          </File>
-          <File size="77536">
-              <![CDATA[bin/sqldrivers/libqsqlmysql.so]]>
+          <File size="498000">
+              <![CDATA[DBManager.tar.gz]]>
           </File>
       </Files>
     </Update>
