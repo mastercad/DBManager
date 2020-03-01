@@ -9,29 +9,30 @@
 
 #include <QDebug>
 
-FileDownloader::FileDownloader(QWidget* mainWindow) :
+FileDownloader::FileDownloader(QObject* mainWindow) :
     QObject(mainWindow),
-    mainWindow(mainWindow)
+    mainWindow(mainWindow),
+    networkManager(this)
 {
 
 }
 
 void FileDownloader::download(QString file) {
     timer = new QTimer(mainWindow);
+    timer->start(0);
+
     QString downloadUrl = Application::UpdateDonwloadUrl+file;
 //    connect(timer, SIGNAL(timeout()), mainWindow, SLOT(updateTimedOut()));
-    timer->start(0);
 //    qDebug() << "Download " << downloadUrl;
-    networkManager = new QNetworkAccessManager(this);
+//    networkManager = new QNetworkAccessManager(this);
+
     QNetworkRequest request(downloadUrl);
-    reply = networkManager->get(request);
+    reply = networkManager.get(request);
+
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), mainWindow, SLOT(updateUpdateProgress(qint64, qint64)));
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), mainWindow, SLOT(updateError(QNetworkReply::NetworkError)));
-//    connect(reply, SIGNAL(finished()), mainWindow, SLOT(updateFileFinished()));
-//    connect(reply, SIGNAL(finished()), mainWindow, SLOT(updateFileFinished()));
-//    connect(networkManager, SIGNAL(finished(QNetworkReply*)), mainWindow, SLOT(finished(QNetworkReply*)));
-    connect(networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
-    connect(networkManager, SIGNAL(finished(QNetworkReply*)), mainWindow, SLOT(updateFileFinished(QNetworkReply*)));
+    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
+    connect(&networkManager, SIGNAL(finished(QNetworkReply*)), mainWindow, SLOT(updateFileFinished(QNetworkReply*)));
 }
 
 void FileDownloader::finished(QNetworkReply* reply) {
@@ -57,7 +58,7 @@ void FileDownloader::finished(QNetworkReply* reply) {
         timer->start(0);
         QNetworkRequest req(redirect);
         req.setRawHeader( "User-Agent" , "DBManager Update" );
-        this->reply = this->networkManager->get(req);
+        this->reply = this->networkManager.get(req);
 
         connect(this->reply, SIGNAL(downloadProgress(qint64, qint64)), mainWindow, SLOT(updateUpdateProgress(qint64, qint64)));
         connect(this->reply, SIGNAL(error(QNetworkReply::NetworkError)), mainWindow, SLOT(updateError(QNetworkReply::NetworkError)));

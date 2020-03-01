@@ -14,7 +14,7 @@ class FileDownloader : public QObject
     Q_OBJECT
 
 public:
-    FileDownloader(QWidget*);
+    FileDownloader(QObject*);
     ~FileDownloader();
     void download(QString file);
 
@@ -29,12 +29,12 @@ private:
     QString sourcePathName;
     QString downloadUrl;
     QString targetPathName;
-    QTimer* timer;
+    QTimer* timer = nullptr;
     bool downloadFinished = false;
 
-    QWidget* mainWindow;
-    QNetworkAccessManager* networkManager;
-    QNetworkReply* reply;
+    QObject* mainWindow = nullptr;
+    QNetworkAccessManager networkManager;
+    QNetworkReply* reply = nullptr;
 };
 
 #endif // FILEDOWNLOADER_H
