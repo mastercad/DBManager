@@ -95,7 +95,8 @@ DISTFILES += \
     TODO.md \
     translations/dbManager_de_DE.qph \
     update.xml \
-    dependencyResolver.bash
+    dependencyResolver.bash \
+    DBManager/DBManager.sh
 
 RESOURCES += \
     resources.qrc
