@@ -9,6 +9,7 @@
 #include <QTreeView>
 #include <QTableView>
 #include <QStandardItemModel>
+#include <QSqlTableModel>
 #include <QSqlRelationalTableModel>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -39,7 +40,9 @@ protected:
     QTextEdit* informationView = nullptr;
     QCompleter* completer = nullptr;
     QStandardItemModel* databaseCollection = nullptr;
-    QStandardItemModel* queryResultModel = nullptr;
+//    QStandardItemModel* queryResultModel = nullptr;
+//    QSqlTableModel* queryResultModel = nullptr;
+    QSqlRelationalTableModel* queryResultModel = nullptr;
 //    QSqlRelationalTableModel* queryResultModel = nullptr;
 
 signals:
@@ -88,6 +91,8 @@ public slots:
     virtual void deleteResultViewSelection() = 0;
     virtual void pasteToResultView() = 0;
     virtual void insertNullToResultView() = 0;
+    virtual void cellEntered(int, int) = 0;
+    virtual void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&) = 0;
 };
 
 #endif // CONNECTION_H

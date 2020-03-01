@@ -97,34 +97,24 @@ void SqliteConnection::insertNullToResultView() {
 
 }
 
+void SqliteConnection::cellEntered(int row, int cell) {
+
+}
+
+void SqliteConnection::dataChanged(const QModelIndex& fromIndex, const QModelIndex& toIndex, const QVector<int>& role) {
+
+}
+
 void SqliteConnection::handleTableClicked(QModelIndex index) {
     QStandardItem* item = databaseCollection->itemFromIndex(index);
     activeTableName = item->text();
 
     delete queryResultModel;
-    queryResultModel = new QStandardItemModel;
 
-    QSqlQuery query = sendQuery("SELECT * FROM "+activeTableName);
-
-    if (query.isActive()) {
-        QSqlRecord localRecord = query.record();
-        for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
-            QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
-            queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
-        }
-
-        query.seek(-1);
-
-        int currentRow = 0;
-        while (query.next()) {
-            QSqlRecord currentRecord = query.record();
-            for (int currentColumn = 0; currentColumn < currentRecord.count(); ++currentColumn) {
-                QStandardItem* value = new QStandardItem(currentRecord.field(currentColumn).value().toString());
-                queryResultModel->setItem(currentRow, currentColumn, value);
-            }
-            ++currentRow;
-        }
-    }
+    queryResultModel = new QSqlRelationalTableModel(this, database);
+    queryResultModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    queryResultModel->setTable(activeTableName);
+    queryResultModel->select();
 
     queryResultView->setModel(queryResultModel);
     queryResultView->resizeColumnsToContents();

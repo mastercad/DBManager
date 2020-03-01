@@ -13,6 +13,10 @@
 
 #include <QDebug>
 
+/**
+  * Class for Manage Connection Edit, Load and Save.
+  */
+
 //ConnectionManager::ConnectionManager(MainWindow *parent, QMap<QString, QMap<QString, ConnectionInfo*> >* connections) :
 ConnectionManager::ConnectionManager(MainWindow *parent, Connections* connections) :
     QDialog(parent),

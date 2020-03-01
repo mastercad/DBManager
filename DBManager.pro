@@ -57,7 +57,8 @@ SOURCES += \
     mysqlconnectionvalidator.cpp \
     sqliteconnectionvalidator.cpp \
     updatemanager.cpp \
-    filedownloader.cpp
+    filedownloader.cpp \
+    defaults.cpp
 
 HEADERS += \
     mainwindow.h \

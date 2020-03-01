@@ -3,7 +3,6 @@
 
 #include "connection.h"
 
-#include <QStandardItemModel>
 #include <QStandardItem>
 #include <QPoint>
 #include <QWidget>
@@ -32,6 +31,8 @@ public slots:
     void deleteResultViewSelection();
     void pasteToResultView();
     void insertNullToResultView();
+    void cellEntered(int, int);
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&);
 
 public:
     void init();

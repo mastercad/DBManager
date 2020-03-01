@@ -10,6 +10,12 @@ namespace Defaults {
         const QString USER = "root";
         const QString PASSWORD = "root";
     }
+
+    class Resolver {
+        public:
+        static QString resolve(QString key, QString currentValue);
+        static int resolve(QString key, int currentValue);
+    };
 }
 
 namespace Application {

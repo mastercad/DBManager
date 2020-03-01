@@ -232,34 +232,19 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
 
     queryResultModel = nullptr;
     delete queryResultModel;
-    queryResultModel = new QStandardItemModel;
-//    queryResultModel = new QSqlRelationalTableModel();
+    queryResultModel = new QSqlRelationalTableModel(this, database);
+    queryResultModel->setTable(activeTableName);
+    queryResultModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    queryResultModel->select();
 
-    database.open();
-    QSqlQuery query = sendQuery("SELECT * FROM "+activeTableName);
+    connect(queryResultModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
 
-    if (query.isActive()) {
-        QSqlRecord localRecord = query.record();
-        for (int currentPos = 0; currentPos < localRecord.count(); ++currentPos) {
-            QStandardItem* headerItem = new QStandardItem(localRecord.fieldName(currentPos));
-            queryResultModel->setHorizontalHeaderItem(currentPos, headerItem);
-        }
-
-        query.seek(-1);
-
-        int currentRow = 0;
-        while (query.next()) {
-            QSqlRecord currentRecord = query.record();
-            for (int currentColumn = 0; currentColumn < currentRecord.count(); ++currentColumn) {
-                QVariant variant = currentRecord.field(currentColumn).value();
-                QStandardItem* cellItem = new QStandardItem(variant.isNull() ? "NULL" : variant.toString());
-                queryResultModel->setItem(currentRow, currentColumn, cellItem);
-            }
-            ++currentRow;
-        }
-    }
     queryResultView->setModel(queryResultModel);
     queryResultView->resizeColumnsToContents();
+}
+
+void MysqlConnection::dataChanged(const QModelIndex& indexFrom, const QModelIndex& indexTo, const QVector<int>& role) {
+    qDebug() << "MysqlConnection::dataChanged indexFrom: " << indexFrom << " indexTo: " << indexTo << " Role: " << role;
 }
 
 void MysqlConnection::showResultTableContextMenu(const QPoint& point) {
@@ -383,59 +368,26 @@ void MysqlConnection::deleteResultViewSelection() {
 
 void MysqlConnection::pasteToResultView() {
     QClipboard *clipboard = QGuiApplication::clipboard();
-    int minRow = queryResultModel->rowCount();
-    int maxRow = -1;
-    int minCol = queryResultModel->columnCount();
-    int maxCol = -1;
 
     QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
-
     foreach (QModelIndex index, indexes) {
-        minRow = qMin(minRow, index.row());
-        maxRow = qMax(maxRow, index.row());
-        minCol = qMin(minCol, index.column());
-        maxCol = qMax(maxCol, index.column());
-    }
-
-    if (0 > maxCol
-        || 0 > maxRow
-    ) {
-        return;
-    }
-
-    for (int row = minRow; row <= maxRow; row++) {
-        for (int col = minCol; col <= maxCol; col++) {
-            queryResultModel->itemFromIndex(queryResultModel->index(row, col))->setText(clipboard->text());
-        }
+        QVariant variant = queryResultModel->data(index);
+        variant.setValue(clipboard->text());
+        queryResultModel->setData(index, variant);
     }
 }
 
 void MysqlConnection::insertNullToResultView() {
-    int minRow = queryResultModel->rowCount();
-    int maxRow = -1;
-    int minCol = queryResultModel->columnCount();
-    int maxCol = -1;
-
     QList<QModelIndex> indexes = queryResultView->selectionModel()->selection().indexes();
-
     foreach (QModelIndex index, indexes) {
-        minRow = qMin(minRow, index.row());
-        maxRow = qMax(maxRow, index.row());
-        minCol = qMin(minCol, index.column());
-        maxCol = qMax(maxCol, index.column());
+        QVariant variant = queryResultModel->data(index);
+        variant.setValue(nullptr);
+        queryResultModel->setData(index, variant);
     }
+}
 
-    if (0 > maxCol
-        || 0 > maxRow
-    ) {
-        return;
-    }
-
-    for (int row = minRow; row <= maxRow; row++) {
-        for (int col = minCol; col <= maxCol; col++) {
-            queryResultModel->itemFromIndex(queryResultModel->index(row, col))->setText("NULL");
-        }
-    }
+void MysqlConnection::cellEntered(int row, int cell) {
+    qDebug() << "MysqlConnection::cellEntered: Row: " << row << " Cell: " << cell;
 }
 
 bool MysqlConnection::switchDatabase(QString databaseName) {

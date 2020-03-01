@@ -439,8 +439,10 @@ void MainWindow::onEstablishNewConnection(QAction *action) {
 
 Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection = connectionFactory->create(connectionInfo);
+
     connect(dbConnection, SIGNAL(connectionError(QString)), this, SLOT(handleConnectionError(QString)));
     connect(ui->databaseList, SIGNAL(customContextMenuRequested(const QPoint&)), this->dbConnection, SLOT(showDatabaseContextMenu(const QPoint&)));
+
     ui->queryResult->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->queryResult, SIGNAL(customContextMenuRequested(QPoint)), this->dbConnection, SLOT(showResultTableContextMenu(QPoint)));
 
@@ -456,7 +458,7 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     if ("SQLITE" == connectionInfo->getConnectionType()) {
         setWindowTitle(QString("%1 - %2").arg(connectionInfo->getDatabaseName()).arg("Database Manager"));
     } else {
-        setWindowTitle(QString("%1@%2 - %3").arg(connectionInfo->getUser()).arg(connectionInfo->getHost()).arg("Database Manager"));
+        setWindowTitle(QString("%1@%2 - %3").arg(Defaults::Resolver::resolve("user", connectionInfo->getUser())).arg(connectionInfo->getHost()).arg("Database Manager"));
     }
 
     return dbConnection;

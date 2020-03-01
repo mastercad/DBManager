@@ -30,6 +30,8 @@ public slots:
     void deleteResultViewSelection();
     void pasteToResultView();
     void insertNullToResultView();
+    void cellEntered(int, int);
+    void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&);
 };
 
 #endif // SQLITECONNECTION_H
