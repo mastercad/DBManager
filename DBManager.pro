@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql network xml
 
 #CONFIG -= import_plugins
 CONFIG += c++11
@@ -55,7 +55,9 @@ SOURCES += \
     sqliteconnectioneditwidget.cpp \
     connections.cpp \
     mysqlconnectionvalidator.cpp \
-    sqliteconnectionvalidator.cpp
+    sqliteconnectionvalidator.cpp \
+    updatemanager.cpp \
+    filedownloader.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -77,7 +79,10 @@ HEADERS += \
     sqliteconnectioneditwidget.h \
     connections.h \
     mysqlconnectionvalidator.h \
-    sqliteconnectionvalidator.h
+    sqliteconnectionvalidator.h \
+    defaults.h \
+    updatemanager.h \
+    filedownloader.h
 
 FORMS += \
     mainwindow.ui \
@@ -88,7 +93,9 @@ FORMS += \
 DISTFILES += \
     README.md \
     TODO.md \
-    translations/dbManager_de_DE.qph
+    translations/dbManager_de_DE.qph \
+    update.xml \
+    dependencyResolver.bash
 
 RESOURCES += \
     resources.qrc

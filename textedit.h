@@ -64,7 +64,7 @@ class TextEdit : public QTextEdit
 
 public:
     TextEdit(QWidget *parent = nullptr);
-    ~TextEdit();
+    ~TextEdit() override;
 
     void setCompleter(QCompleter *completer);
     QCompleter* getCompleter() const;

@@ -168,7 +168,8 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="action_ber_DBManager"/>
+    <addaction name="actionAboutDBManager"/>
+    <addaction name="actionCheckForUpdates"/>
    </widget>
    <addaction name="menuMain_Tool_Bar"/>
    <addaction name="menuHilfe"/>
@@ -213,9 +214,18 @@
     <string>Submenu</string>
    </property>
   </action>
-  <action name="action_ber_DBManager">
+  <action name="actionAboutDBManager">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/hilfe_schatten.png</normaloff>:/icons/hilfe_schatten.png</iconset>
+   </property>
    <property name="text">
     <string>about DBManager</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="text">
+    <string>check for Updates</string>
    </property>
   </action>
  </widget>

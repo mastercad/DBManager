@@ -18,5 +18,7 @@
         <file>translations/dbManager_en.ts</file>
         <file>translations/dbManager.qph</file>
         <file>translations/dbManager_de.qm</file>
+        <file>icons/add_schatten.png</file>
+        <file>icons/hilfe_schatten.png</file>
     </qresource>
 </RCC>

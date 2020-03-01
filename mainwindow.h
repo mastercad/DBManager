@@ -6,13 +6,18 @@
 #include "connections.h"
 #include "connectioninfofactory.h"
 #include "connectioninfo.h"
+#include "filedownloader.h"
 
 #include <QMainWindow>
 #include <QObjectData>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+#include <QNetworkAccessManager>
 #include <QCompleter>
+#include <QNetworkReply>
+#include <QProgressDialog>
 #include <QPoint>
+#include <QList>
 
 class QTreeModel;
 
@@ -38,11 +43,20 @@ public slots:
     void saveConnectionInfos();
     void handleConnectionError(QString errorMessage);
     void handleChangedQueryRequest();
+    void handleUpdateInformationDownload(QNetworkReply*);
     void markAsUnsaved(bool);
     void saveQuery();
     void loadQuery();
     void onChangeTab(int);
     void closeTab(int);
+    void checkUpdateAvailable();
+    void updateCanceled();
+    void updateTimedOut();
+    void updateUpdateProgress(qint64 current, qint64 max);
+    void updateError(QNetworkReply::NetworkError error);
+    void updateFileFinished(QNetworkReply* reply);
+    void adjustProgressValue(int value);
+    void showAboutText();
 
 private:
     Ui::MainWindow *ui;
@@ -59,7 +73,6 @@ private:
     void hideQuerySaveIcon();
     void newTab();
 
-    QString currentQuery = "";
     Connection* establishNewConnection(ConnectionInfo* connectionInfo);
 
     QString generateLastExecutedQuery(const QSqlQuery& query);
@@ -77,12 +90,17 @@ private:
     ConnectionFactory* connectionFactory = nullptr;
     ConnectionInfoFactory* connectionInfoFactory = nullptr;
 
+    QNetworkAccessManager networkManager;
+    QProgressDialog* progressDialogUpdate = nullptr;
+
 //    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
     Connections connections;
+    QMap<int, QString> currentQueryRequests;
     QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = nullptr;
     bool connectionsSaved = true;
+    QList<FileDownloader*> fileDownloaderCollection;
 };
 
 #endif // MAINWINDOW_H
