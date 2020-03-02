@@ -237,14 +237,43 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     queryResultModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     queryResultModel->select();
 
+    // Create reference to validate data if changed
+    origQueryResultModel = nullptr;
+    delete origQueryResultModel;
+    origQueryResultModel = new QSqlRelationalTableModel(this, database);
+    origQueryResultModel->setTable(activeTableName);
+    origQueryResultModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    origQueryResultModel->select();
+
     connect(queryResultModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
 
     queryResultView->setModel(queryResultModel);
+    queryResultView->setVisible(false);
     queryResultView->resizeColumnsToContents();
+    queryResultView->setVisible(true);
 }
 
 void MysqlConnection::dataChanged(const QModelIndex& indexFrom, const QModelIndex& indexTo, const QVector<int>& role) {
     qDebug() << "MysqlConnection::dataChanged indexFrom: " << indexFrom << " indexTo: " << indexTo << " Role: " << role;
+    qDebug() << "OriginalResult Model: " << this->origQueryResultModel;
+    qDebug() << "QueryResult Model: " << this->queryResultModel;
+
+    bool changed = false;
+    for (int row = indexFrom.row(); row <= indexTo.row(); row++) {
+        for (int col = indexFrom.column(); col <= indexTo.column(); col++) {
+            QVariant variant = queryResultModel->data(queryResultModel->index(row, col));
+            QVariant variantOrig = origQueryResultModel->data(queryResultModel->index(row, col));
+            qDebug() << "Inhalt " << row << ":" << col << ": " << variant.toString() << " Orig: " << variantOrig;
+
+            if (variantOrig != variant) {
+                changed = true;
+            }
+        }
+    }
+
+    qDebug() << "Data changed: " << changed;
+
+//    parent->emit(queryResultDataChanged());
 }
 
 void MysqlConnection::showResultTableContextMenu(const QPoint& point) {
@@ -421,4 +450,27 @@ bool MysqlConnection::switchDatabase(QString databaseName) {
         return false;
     }
     return true;
+}
+
+void MysqlConnection::saveQueryResultChanges() {
+    qDebug() << "Save QueryResultChanges!";
+
+    this->queryResultModel->database().transaction();
+
+    if (this->queryResultModel->submitAll()) {
+        this->queryResultModel->database().commit();
+    } else {
+        if (this->queryResultModel->lastError().isValid()) {
+            this->informationView->append(this->queryResultModel->lastError().text());
+            qCritical() << this->queryResultModel->lastError();
+        }
+        this->queryResultModel->database().rollback();
+    }
+}
+
+void MysqlConnection::cancelQueryResultChanges() {
+    qDebug() << "Cancel QueryResultChanges!";
+
+    this->queryResultModel->revertAll();
+    this->queryResultModel->database().rollback();
 }

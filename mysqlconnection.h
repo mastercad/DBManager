@@ -12,6 +12,9 @@ class MysqlConnection : public Connection
 {
     using Connection::Connection;
 
+signals:
+    void queryResultDataChanged();
+
 private:
     bool switchDatabase(QString databaseName);
     void handleTableClicked(QStandardItem* item);
@@ -22,6 +25,8 @@ private:
 
 public slots:
     void onListViewDoubleClicked(const QModelIndex index);
+    void saveQueryResultChanges();
+    void cancelQueryResultChanges();
     void showDatabaseContextMenu(const QPoint&);
     void showResultTableContextMenu(const QPoint&);
     void truncateTable();

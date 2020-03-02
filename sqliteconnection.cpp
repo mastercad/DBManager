@@ -105,6 +105,14 @@ void SqliteConnection::dataChanged(const QModelIndex& fromIndex, const QModelInd
 
 }
 
+void SqliteConnection::saveQueryResultChanges() {
+
+}
+
+void SqliteConnection::cancelQueryResultChanges() {
+
+}
+
 void SqliteConnection::handleTableClicked(QModelIndex index) {
     QStandardItem* item = databaseCollection->itemFromIndex(index);
     activeTableName = item->text();

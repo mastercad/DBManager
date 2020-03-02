@@ -31,6 +31,8 @@ public slots:
     void pasteToResultView();
     void insertNullToResultView();
     void cellEntered(int, int);
+    void saveQueryResultChanges();
+    void cancelQueryResultChanges();
     void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&);
 };
 

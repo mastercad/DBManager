@@ -20,5 +20,7 @@
         <file>translations/dbManager_de.qm</file>
         <file>icons/add_schatten.png</file>
         <file>icons/hilfe_schatten.png</file>
+        <file>icons/release_notes_mit_schatten.png</file>
+        <file>icons/release_notes.png</file>
     </qresource>
 </RCC>

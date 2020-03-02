@@ -43,6 +43,7 @@ protected:
 //    QStandardItemModel* queryResultModel = nullptr;
 //    QSqlTableModel* queryResultModel = nullptr;
     QSqlRelationalTableModel* queryResultModel = nullptr;
+    QSqlRelationalTableModel* origQueryResultModel = nullptr;
 //    QSqlRelationalTableModel* queryResultModel = nullptr;
 
 signals:
@@ -92,6 +93,8 @@ public slots:
     virtual void pasteToResultView() = 0;
     virtual void insertNullToResultView() = 0;
     virtual void cellEntered(int, int) = 0;
+    virtual void saveQueryResultChanges() = 0;
+    virtual void cancelQueryResultChanges() = 0;
     virtual void dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&) = 0;
 };
 

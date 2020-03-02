@@ -68,6 +68,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->currentQueryRequests = new QMap<int, QString>;
     this->updateManager = new UpdateManager(this);
 
+    this->ui->queryResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    QMenuBar* releaseNotesBar = new QMenuBar(ui->menuBar);
+    QAction* releaseNotes = new QAction(QIcon(":/icons/release_notes.png"), "");
+    releaseNotesBar->addAction(releaseNotes);
+    releaseNotesBar->setVisible(true);
+    this->ui->menuBar->setCornerWidget(releaseNotesBar);
+
 /*
     QToolButton *tb = new QToolButton();
     tb->setText("+");
@@ -445,6 +453,9 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
 
     ui->queryResult->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->queryResult, SIGNAL(customContextMenuRequested(QPoint)), this->dbConnection, SLOT(showResultTableContextMenu(QPoint)));
+
+    connect(ui->btnQueryResultSave, SIGNAL(clicked()), this->dbConnection, SLOT(saveQueryResultChanges()));
+    connect(ui->btnQueryResultCancel, SIGNAL(clicked()), this->dbConnection, SLOT(cancelQueryResultChanges()));
 
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
