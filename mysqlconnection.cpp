@@ -251,6 +251,8 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     queryResultView->setModel(queryResultModel);
     queryResultView->setVisible(false);
     queryResultView->resizeColumnsToContents();
+//    queryResultView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    queryResultView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     queryResultView->setVisible(true);
 }
 

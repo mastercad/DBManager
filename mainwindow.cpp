@@ -550,6 +550,8 @@ void MainWindow::onExecuteQueryClicked() {
 
     ui->queryResult->setVisible(false);
     ui->queryResult->setModel(queryResultModel);
+//    ui->queryResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->queryResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->queryResult->resizeColumnsToContents();
     ui->queryResult->setVisible(true);
 
