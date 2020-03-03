@@ -467,10 +467,8 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
 
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
-//    dbConnection->setQueryRequestView(ui->queryRequest);
-//    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->currentTabIndex));
-    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
-    dbConnection->setQueryRequestView(textEdit);
+
+    dbConnection->setQueryRequestView(qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex())));
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
 
@@ -494,6 +492,7 @@ void MainWindow::handleConnectionError(QString errorMessage) {
 }
 
 void MainWindow::onExecuteQueryClicked() {
+    /*
 //    qDebug() << "Current Tab Index von QTabWidget::currentIndex: " << ui->tabWidget->currentIndex();
 
     TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(ui->tabWidget->currentIndex()));
@@ -534,6 +533,26 @@ void MainWindow::onExecuteQueryClicked() {
     ui->queryResult->setModel(queryResultModel);
     ui->queryResult->resizeColumnsToContents();
     statusBar()->showMessage(tr("connected!"));
+*/
+
+    TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(ui->tabWidget->currentIndex()));
+    QString queryString = textEdit->toPlainText();
+
+    if (nullptr == dbConnection) {
+        this->ui->information->append(tr("No Connection established!"));
+        return;
+    }
+
+    QSqlQuery query = dbConnection->sendQuery(queryString);
+
+    QSqlQueryModel* queryResultModel = new QSqlQueryModel;
+    queryResultModel->setQuery(query);
+
+    ui->queryResult->setVisible(false);
+    ui->queryResult->setModel(queryResultModel);
+    ui->queryResult->resizeColumnsToContents();
+    ui->queryResult->setVisible(true);
+
 }
 
 void MainWindow::onQueryResultHeaderClicked(QStandardItem* item) {

@@ -244,6 +244,7 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
     origQueryResultModel->setTable(activeTableName);
     origQueryResultModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     origQueryResultModel->select();
+//    origQueryResultModel->setData(queryResultModel->data());
 
     connect(queryResultModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
 
@@ -255,25 +256,27 @@ void MysqlConnection::handleTableClicked(QStandardItem* item) {
 
 void MysqlConnection::dataChanged(const QModelIndex& indexFrom, const QModelIndex& indexTo, const QVector<int>& role) {
     qDebug() << "MysqlConnection::dataChanged indexFrom: " << indexFrom << " indexTo: " << indexTo << " Role: " << role;
-    qDebug() << "OriginalResult Model: " << this->origQueryResultModel;
-    qDebug() << "QueryResult Model: " << this->queryResultModel;
 
-    bool changed = false;
-    for (int row = indexFrom.row(); row <= indexTo.row(); row++) {
-        for (int col = indexFrom.column(); col <= indexTo.column(); col++) {
-            QVariant variant = queryResultModel->data(queryResultModel->index(row, col));
-            QVariant variantOrig = origQueryResultModel->data(queryResultModel->index(row, col));
-            qDebug() << "Inhalt " << row << ":" << col << ": " << variant.toString() << " Orig: " << variantOrig;
+    if (nullptr != this->origQueryResultModel) {
+        qDebug() << "OriginalResult Model: " << this->origQueryResultModel;
+        qDebug() << "QueryResult Model: " << this->queryResultModel;
 
-            if (variantOrig != variant) {
-                changed = true;
+        bool changed = false;
+        for (int row = indexFrom.row(); row <= indexTo.row(); row++) {
+            for (int col = indexFrom.column(); col <= indexTo.column(); col++) {
+                QVariant variant = queryResultModel->data(queryResultModel->index(row, col));
+                QVariant variantOrig = origQueryResultModel->data(queryResultModel->index(row, col));
+                qDebug() << "Inhalt " << row << ":" << col << ": " << variant.toString() << " Orig: " << variantOrig;
+
+                if (variantOrig != variant) {
+                    changed = true;
+                }
             }
         }
-    }
 
-    qDebug() << "Data changed: " << changed;
-
+        qDebug() << "Data changed: " << changed;
 //    parent->emit(queryResultDataChanged());
+    }
 }
 
 void MysqlConnection::showResultTableContextMenu(const QPoint& point) {
