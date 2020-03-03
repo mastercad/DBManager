@@ -70,12 +70,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->ui->queryResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    QMenuBar* releaseNotesBar = new QMenuBar(ui->menuBar);
-    QAction* releaseNotes = new QAction(QIcon(":/icons/release_notes.png"), "");
-    releaseNotesBar->addAction(releaseNotes);
-    releaseNotesBar->setVisible(true);
-    this->ui->menuBar->setCornerWidget(releaseNotesBar);
-
 /*
     QToolButton *tb = new QToolButton();
     tb->setText("+");
@@ -120,6 +114,20 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCheckForUpdates, SIGNAL(triggered()), this->updateManager, SLOT(checkUpdateAvailable()));
 
     this->updateManager->checkUpdateAvailable(false);
+}
+
+void MainWindow::enableReleaseNotesButton() {
+    QMenuBar* releaseNotesBar = new QMenuBar(ui->menuBar);
+    QAction* releaseNotes = new QAction(QIcon(":/icons/release_notes.png"), "");
+    releaseNotesBar->addAction(releaseNotes);
+    releaseNotesBar->setVisible(true);
+    this->ui->menuBar->setCornerWidget(releaseNotesBar);
+
+    connect(releaseNotes, SIGNAL(triggered()), this, SLOT(showReleaseNotes()));
+}
+
+void MainWindow::showReleaseNotes() {
+    qDebug() << "ShowReleaseNotes!";
 }
 
 void MainWindow::onChangeTab(int index) {

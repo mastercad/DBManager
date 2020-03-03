@@ -32,6 +32,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void enableReleaseNotesButton();
+
 public slots:
     void openNewConnectionWindow();
     void openConnectionManagerWindow();
@@ -48,6 +50,7 @@ public slots:
     void onChangeTab(int);
     void closeTab(int);
     void showAboutText();
+    void showReleaseNotes();
 
 private:
     Ui::MainWindow *ui;

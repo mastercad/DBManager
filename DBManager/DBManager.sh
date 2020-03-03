@@ -14,6 +14,8 @@ updatePath="${absPath}/update/";
 #echo "Absolute Path: $absPath"
 #echo "Update Path: $updatePath"
 
+CALL_ARGUMENTS=""
+
 moveUpdateFiles() {
 	for file in $( find "${updatePath}" ); do
 		if [ $file != $updatePath ] && [ -f $file ]; then
@@ -33,7 +35,14 @@ moveUpdateFiles() {
 #			echo "Verschoben werden würde $absPath/$relativeFilePath"
 			
 #			mv "${file}" "${absPath}/${relativeFilePath}"
-			tar xfvz "${file}" --directory "${absPath}"
+			# check if file is tar archive
+			if [ -e "${file}" ] &&  tar -tzf "${file}" >/dev/null; then
+				if tar -tf "${file}" "bin/DBManager" > /dev/null 2>&1; then
+					CALL_ARGUMENTS="showReleaseNotes $CALL_ARGUMENTS"
+				fi
+				tar xfvz "${file}" --directory "${absPath}" > /dev/null 2>&1
+			fi
+			
 		fi
 	done
 	
@@ -44,5 +53,6 @@ if [ -d "${updatePath}" ] && [ ! -z "$(ls -A "${updatePath}")" ]; then
 	moveUpdateFiles
 fi
 
+result=`"$BASE_DIR/bin/DBManager" "$CALL_ARGUMENTS" "$@"`
 
-"$BASE_DIR"/bin/DBManager "$@"
+echo $result

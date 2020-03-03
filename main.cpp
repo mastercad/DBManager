@@ -22,6 +22,21 @@ int main(int argc, char *argv[])
     mainWindow.setWindowIcon(QIcon(":/icons/programm_icon.png"));
     mainWindow.show();
 
+    for (int i = 0; i < argc; i++) {
+        if ("showReleaseNotes" == QString(argv[i]).trimmed()) {
+            mainWindow.enableReleaseNotesButton();
+        }
+//        qDebug() << "param" << i << " is " << argv[i];
+    }
+
+//    if (argc > 2 ) {
+//      QString name(argv[1]);
+//      int id = atoi(argv[2]);
+
+//      qDebug() << "call func with" << id << " and " << name;
+//    }
+
+
 //    qDebug() << QLocale::system().name();
 
     return application.exec();
