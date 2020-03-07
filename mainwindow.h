@@ -10,6 +10,7 @@
 #include "updatemanager.h"
 #include "releasenotesmanager.h"
 #include "sidebar.h"
+#include "highlighter.h"
 
 #include <QMainWindow>
 #include <QObjectData>
@@ -91,13 +92,13 @@ private:
 //    QMap<QString, QMap<QString, ConnectionInfo*> > connections;
     Connections connections;
     QMap<int, QString>* currentQueryRequests = nullptr;
-    QMap<QString, bool> keywords;
     uint lastQueryTime = 0;
     QCompleter* completer = nullptr;
     bool connectionsSaved = true;
     SideBar* sidebar = nullptr;
     bool sideBarVisible = false;
     ReleaseNotesManager* releaseNotesManager = nullptr;
+    Highlighter* highlighter = nullptr;
 };
 
 #endif // MAINWINDOW_H

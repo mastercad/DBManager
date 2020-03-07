@@ -16,6 +16,8 @@
 #include <QSqlError>
 #include <QTextEdit>
 #include <QPoint>
+#include <QString>
+#include <QMap>
 #include <QCompleter>
 
 class Connection: public QObject
@@ -32,6 +34,9 @@ protected:
 
     QString activeTableName;
     QString activeDatabaseName;
+
+    // KEYWORD, RESERVED
+    QMap<QString, bool>* keywords = nullptr;
 
     QObject* parent = nullptr;
     QTreeView* databaseListView = nullptr;
@@ -72,6 +77,9 @@ public:
     ConnectionInfo* getConnectionInfo() const;
 
     QString generateLastExecutedQuery(const QSqlQuery& query);
+
+    void setKeywords(QMap<QString, bool>*);
+    QMap<QString, bool>* getKeywords() const;
 
     QSqlError lastError();
     void close();

@@ -68,6 +68,14 @@ ConnectionInfo* Connection::getConnectionInfo() const {
     return this->connectionInfo;
 }
 
+void Connection::setKeywords(QMap<QString, bool>* keywords) {
+    this->keywords = keywords;
+}
+
+QMap<QString, bool>* Connection::getKeywords() const {
+    return this->keywords;
+}
+
 QString Connection::generateLastExecutedQuery(const QSqlQuery& query) {
     /*
     QString sql = query.executedQuery();

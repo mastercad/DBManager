@@ -105,15 +105,24 @@ void TextEdit::insertCompletion(const QString &completion) {
 }
 
 QString TextEdit::textNearCursor(int movePosition = 0) const {
-//    QTextCursor tc = textCursor();
-//    tc.select(QTextCursor::WordUnderCursor);
+    QTextCursor tc = textCursor();
+    tc.select(QTextCursor::WordUnderCursor);
+    QString textUnderCursor = tc.selectedText();
 
     QTextCursor textCursorLeft = textCursor();
     textCursorLeft.movePosition(QTextCursor::WordLeft);
     textCursorLeft.select(QTextCursor::WordUnderCursor);
+    QString textLeftCursor = textCursorLeft.selectedText();
 
-    qDebug() << "Text left Cursor: " << textCursorLeft.selectedText();
-//    qDebug() << "Text under Cursor: " << tc.selectedText();
+    QTextCursor textCursorLeftLeft = textCursor();
+    textCursorLeftLeft.movePosition(QTextCursor::WordLeft);
+    textCursorLeftLeft.movePosition(QTextCursor::WordLeft);
+    textCursorLeftLeft.select(QTextCursor::WordUnderCursor);
+    QString textLeftLeftCursor = textCursorLeftLeft.selectedText();
+
+    qDebug() << "Text under Cursor: " << textUnderCursor;
+    qDebug() << "Text left Cursor: " << textLeftCursor;
+    qDebug() << "Text left left Cursor: " << textLeftLeftCursor;
 
     return textCursorLeft.selectedText();
 }

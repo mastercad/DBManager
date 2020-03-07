@@ -177,6 +177,13 @@ void MainWindow::newTab() {
     int position = ui->tabWidget->count() - 1;
 
     TextEdit* textEdit = new TextEdit(this);
+
+    if (nullptr != dbConnection
+        && nullptr != dbConnection->getKeywords()
+    ) {
+        highlighter = new Highlighter(textEdit->document(), dbConnection->getKeywords());
+    }
+
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(handleChangedQueryRequest()));
 
     ui->tabWidget->insertTab(position, textEdit, QString(tr("New tab")));
@@ -476,6 +483,13 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection->setQueryRequestView(qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex())));
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
+
+    if (nullptr != dbConnection
+        && nullptr != dbConnection->getKeywords()
+    ) {
+        TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
+        highlighter = new Highlighter(textEdit->document(), dbConnection->getKeywords());
+    }
 
     if ("SQLITE" == connectionInfo->getConnectionType()) {
         setWindowTitle(QString("%1 - %2").arg(connectionInfo->getDatabaseName()).arg("Database Manager"));

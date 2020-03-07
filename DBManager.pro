@@ -63,7 +63,8 @@ SOURCES += \
     releasenote.cpp \
     releasenotesmanager.cpp \
     releasenotesparser.cpp \
-    releasenotesdownloader.cpp
+    releasenotesdownloader.cpp \
+    highlighter.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -93,7 +94,8 @@ HEADERS += \
     releasenote.h \
     releasenotesmanager.h \
     releasenotesparser.h \
-    releasenotesdownloader.h
+    releasenotesdownloader.h \
+    highlighter.h
 
 FORMS += \
     mainwindow.ui \

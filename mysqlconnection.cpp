@@ -120,17 +120,14 @@ void MysqlConnection::collectTableInformations() {
     query.exec("SELECT * FROM SCHEMATA");
 
     query.exec("SELECT * FROM KEYWORDS");
-    /*
-    keywords.clear();
+
+    keywords = new QMap<QString, bool>();
+
     if (query.isActive()) {
         while (query.next()) {
-            QSqlRecord currentRecord = query.record();
-            keywords.insert(currentRecord.field(0).value().toString(), currentRecord.field(1).value().toBool());
+            keywords->insert(query.value(0).toString(), query.value(1).toBool());
         }
     }
-    qDebug() << keywords;
-    */
-//    switchDatabase(databaseName);
 }
 
 void MysqlConnection::showDatabaseContextMenu(const QPoint& position) {
