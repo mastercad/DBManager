@@ -58,7 +58,12 @@ SOURCES += \
     sqliteconnectionvalidator.cpp \
     updatemanager.cpp \
     filedownloader.cpp \
-    defaults.cpp
+    defaults.cpp \
+    sidebar.cpp \
+    releasenote.cpp \
+    releasenotesmanager.cpp \
+    releasenotesparser.cpp \
+    releasenotesdownloader.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -83,7 +88,12 @@ HEADERS += \
     sqliteconnectionvalidator.h \
     defaults.h \
     updatemanager.h \
-    filedownloader.h
+    filedownloader.h \
+    sidebar.h \
+    releasenote.h \
+    releasenotesmanager.h \
+    releasenotesparser.h \
+    releasenotesdownloader.h
 
 FORMS += \
     mainwindow.ui \
@@ -97,7 +107,8 @@ DISTFILES += \
     translations/dbManager_de_DE.qph \
     update.xml \
     dependencyResolver.bash \
-    DBManager/DBManager.sh
+    DBManager/DBManager.sh \
+    releaseNotes.xml
 
 RESOURCES += \
     resources.qrc

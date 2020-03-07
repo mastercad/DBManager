@@ -30,7 +30,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <item>
      <widget class="QSplitter" name="splitter_2">
       <property name="sizePolicy">
@@ -339,6 +339,46 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="QWidget" name="sideBarContainer" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMaximumSize</enum>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="sideBarLayout" stretch="">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -375,8 +415,15 @@
     <addaction name="actionAboutDBManager"/>
     <addaction name="actionCheckForUpdates"/>
    </widget>
+   <widget class="QMenu" name="menuSideBar">
+    <property name="title">
+     <string>sidebar</string>
+    </property>
+    <addaction name="actionSideBar"/>
+   </widget>
    <addaction name="menuMain_Tool_Bar"/>
    <addaction name="menuHilfe"/>
+   <addaction name="menuSideBar"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -434,6 +481,11 @@
    </property>
    <property name="toolTip">
     <string>Click Entry to check for new updates for DBManager</string>
+   </property>
+  </action>
+  <action name="actionSideBar">
+   <property name="text">
+    <string>sidebar</string>
    </property>
   </action>
  </widget>

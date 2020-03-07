@@ -8,6 +8,8 @@
 #include "connectioninfo.h"
 #include "filedownloader.h"
 #include "updatemanager.h"
+#include "releasenotesmanager.h"
+#include "sidebar.h"
 
 #include <QMainWindow>
 #include <QObjectData>
@@ -93,6 +95,9 @@ private:
     uint lastQueryTime = 0;
     QCompleter* completer = nullptr;
     bool connectionsSaved = true;
+    SideBar* sidebar = nullptr;
+    bool sideBarVisible = false;
+    ReleaseNotesManager* releaseNotesManager = nullptr;
 };
 
 #endif // MAINWINDOW_H

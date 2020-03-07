@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ReleaseNotes>
+    <ReleaseNote>
+        <Name>Wieder eine Releasenote</Name>
+        <Date>12.02.2020</Date>
+        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird.</Content>
+    </ReleaseNote>
+    <ReleaseNote>
+        <Name>Eine weitere Releasenote</Name>
+        <Date>11.02.2020</Date>
+        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird. hier ist ein manueller umbruch.</Content>
+    </ReleaseNote>
+    <ReleaseNote>
+        <Name>Erste Releasenote</Name>
+        <Date>10.02.2020</Date>
+        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird.hier ist ein manueller umbruch.</Content>
+    </ReleaseNote>
+</ReleaseNotes>

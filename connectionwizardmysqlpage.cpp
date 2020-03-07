@@ -21,30 +21,31 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     : QWizardPage(parent)
 {
     setTitle(tr("Mysql Connection"));
-//    setPixmap(QWizard::BackgroundPixmap, QPixmap(":/logos/mysql.png"));
     setPixmap(QWizard::WatermarkPixmap, QPixmap(":/logos/mysql_small.png"));
 
     database = QSqlDatabase::addDatabase("QMYSQL", "mysql");
 
-//    topLabel = new QLabel(tr("On this page you can provide your MySQL Connection details."));
-//    topLabel->setWordWrap(true);
-
-    QLabel* nameLabel = new QLabel(tr("Name:"));
-    QLabel* hostLabel = new QLabel(tr("Host:"));
-    QLabel* portLabel = new QLabel(tr("Port:"));
-    QLabel* userLabel = new QLabel(tr("User:"));
-    QLabel* passwordLabel = new QLabel(tr("Password:"));
-    QLabel* databaseLabel = new QLabel(tr("Database:"));
+    QLabel* nameLabel = new QLabel(tr("&Name:"));
+    QLabel* hostLabel = new QLabel(tr("&Host:"));
+    QLabel* portLabel = new QLabel(tr("&Port:"));
+    QLabel* userLabel = new QLabel(tr("&User:"));
+    QLabel* passwordLabel = new QLabel(tr("Pass&word:"));
+    QLabel* databaseLabel = new QLabel(tr("&Database:"));
 
     nameEdit = new QLineEdit;
+    nameLabel->setBuddy(nameEdit);
     nameEdit->setPlaceholderText(tr("Define name for new connection"));
     hostEdit = new QLineEdit;
+    hostLabel->setBuddy(hostEdit);
     hostEdit->setPlaceholderText(Defaults::MYSQL::HOST);
     portEdit = new QLineEdit;
+    portLabel->setBuddy(portEdit);
     portEdit->setPlaceholderText(QString::number(Defaults::MYSQL::PORT));
     userEdit = new QLineEdit;
+    userLabel->setBuddy(userEdit);
     userEdit->setPlaceholderText(Defaults::MYSQL::USER);
     passwordEdit = new QLineEdit;
+    passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
     passwordEdit->setPlaceholderText(Defaults::MYSQL::PASSWORD);
 
@@ -87,10 +88,6 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
     QGridLayout* layout = new QGridLayout;
     layout->addWidget(nameLabel, 0, 0, 1, 1);
     layout->addWidget(nameEdit, 0, 1, 1, 3);
-//    layout->addWidget(hostLabel, 1, 0, 1, 1);
-//    layout->addWidget(hostEdit, 1, 1, 1, 4);
-//    layout->addWidget(portLabel, 1, 2, 1, 1);
-//    layout->addWidget(portEdit, 1, 3, 1, 1);
     layout->addLayout(hostNameContainer, 1, 0, 1, 4);
     layout->addWidget(userLabel, 2, 0, 1, 1);
     layout->addWidget(userEdit, 2, 1, 1, 3);
@@ -103,15 +100,6 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
 
     setLayout(layout);
 
-    /*
-    registerField("mysql.connection.name", nameEdit, "New Connection", "textChanged");
-    registerField("mysql.connection.valid", mysqlConnectionValidEdit, "NO", "textChanged");
-    registerField("mysql.host", hostEdit, "localhost", "textChanged");
-    registerField("mysql.port", portEdit, "3306", "textChanged");
-    registerField("mysql.user", userEdit, "root", "textChanged");
-    registerField("mysql.password", passwordEdit, "root", "textChanged");
-    registerField("mysql.database", databaseEdit, "", "textChanged");
-    */
     registerField("mysql.connection.name", nameEdit);
     registerField("mysql.connection.valid", mysqlConnectionValidEdit);
     registerField("mysql.host", hostEdit);
@@ -124,7 +112,6 @@ ConnectionWizardMysqlPage::ConnectionWizardMysqlPage(QWidget* parent)
 }
 
 void ConnectionWizardMysqlPage::initializePage() {
-//    qDebug() << "INIT ConnectionWizardMysqlPage!";
     wizard()->button(QWizard::NextButton)->setVisible(false);
     wizard()->button(QWizard::NextButton)->setEnabled(false);
     wizard()->button(QWizard::FinishButton)->setEnabled(false);

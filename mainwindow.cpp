@@ -35,6 +35,8 @@
 #include <QTimer>
 #include <QProgressDialog>
 #include <QProcess>
+#include <QPropertyAnimation>
+#include <QDate>
 
 #include <QDebug>
 
@@ -64,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->queryResult->setSortingEnabled(true);
     ui->btnQuerySave->hide();
+
+    releaseNotesManager = new ReleaseNotesManager(this->ui->sideBarContainer, this->ui->sideBarLayout, parent);
 
     this->currentQueryRequests = new QMap<int, QString>;
     this->updateManager = new UpdateManager(this);
@@ -112,6 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAboutDBManager, SIGNAL(triggered()), this, SLOT(showAboutText()));
 
     connect(ui->actionCheckForUpdates, SIGNAL(triggered()), this->updateManager, SLOT(checkUpdateAvailable()));
+    connect(ui->actionSideBar, SIGNAL(triggered(bool)), this, SLOT(showReleaseNotes()));
 
     this->updateManager->checkUpdateAvailable(false);
 }
@@ -127,7 +132,7 @@ void MainWindow::enableReleaseNotesButton() {
 }
 
 void MainWindow::showReleaseNotes() {
-    qDebug() << "ShowReleaseNotes!";
+    releaseNotesManager->toggle();
 }
 
 void MainWindow::onChangeTab(int index) {

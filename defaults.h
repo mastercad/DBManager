@@ -25,6 +25,7 @@ namespace Application {
     const QString UpdatePath = "/DBManager";
     const QString UpdateDonwloadUrl = "https://byte-artist.de/DBManager/";
     const QString UpdateUrl = "https://byte-artist.de/DBManager/update.xml";
+    const QString ReleaseNotesUrl = "https://byte-artist.de/DBManager/releaseNotes.xml";
 }
 
 #endif // DEFAULTS_H
