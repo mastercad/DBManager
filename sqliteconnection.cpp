@@ -26,7 +26,7 @@ void SqliteConnection::loadDatabaseList() {
     databaseCollection->setItem(0, 0, item);
     getDatabaseListView()->header()->hide();
     getDatabaseListView()->setModel(databaseCollection);
-
+/*
     completer = new QCompleter();
 //    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
     completer->setModel(databaseCollection);
@@ -34,7 +34,7 @@ void SqliteConnection::loadDatabaseList() {
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     getQueryRequestView()->setCompleter(completer);
-
+*/
     loadTablesList();
 
     connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));

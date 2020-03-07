@@ -43,7 +43,7 @@ void Connection::setQueryResultView(QTableView *queryResultView) {
 QTableView* Connection::getQueryResultView() const {
     return this->queryResultView;
 }
-
+/*
 void Connection::setQueryRequestView(TextEdit *queryRequestView) {
     this->queryRequestView = queryRequestView;
 }
@@ -51,7 +51,7 @@ void Connection::setQueryRequestView(TextEdit *queryRequestView) {
 TextEdit* Connection::getQueryRequestView() const {
     return this->queryRequestView;
 }
-
+*/
 void Connection::setInformationView(QTextEdit *informationView) {
     this->informationView = informationView;
 }
@@ -74,6 +74,14 @@ void Connection::setKeywords(QMap<QString, bool>* keywords) {
 
 QMap<QString, bool>* Connection::getKeywords() const {
     return this->keywords;
+}
+
+void Connection::setDatabaseCollection(QStandardItemModel* databaseCollection) {
+    this->databaseCollection = databaseCollection;
+}
+
+QStandardItemModel* Connection::getDatabaseCollection() {
+    return this->databaseCollection;
 }
 
 QString Connection::generateLastExecutedQuery(const QSqlQuery& query) {

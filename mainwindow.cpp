@@ -176,7 +176,7 @@ void MainWindow::closeTab(int index) {
 void MainWindow::newTab() {
     int position = ui->tabWidget->count() - 1;
 
-    TextEdit* textEdit = new TextEdit(this);
+    TextEdit* textEdit = new TextEdit(dbConnection, this);
 
     if (nullptr != dbConnection
         && nullptr != dbConnection->getKeywords()
@@ -480,7 +480,7 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     dbConnection->setDatabaseListView(ui->databaseList);
     dbConnection->setQueryResultView(ui->queryResult);
 
-    dbConnection->setQueryRequestView(qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex())));
+//    dbConnection->setQueryRequestView(qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex())));
     dbConnection->setInformationView(ui->information);
     dbConnection->loadDatabaseList();
 
@@ -489,6 +489,7 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     ) {
         TextEdit* textEdit = qobject_cast<TextEdit*>(ui->tabWidget->widget(this->ui->tabWidget->currentIndex()));
         highlighter = new Highlighter(textEdit->document(), dbConnection->getKeywords());
+        textEdit->setConnection(dbConnection);
     }
 
     if ("SQLITE" == connectionInfo->getConnectionType()) {

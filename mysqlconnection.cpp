@@ -53,13 +53,13 @@ void MysqlConnection::loadDatabaseList() {
         getDatabaseListView()->header()->hide();
         getDatabaseListView()->setModel(databaseCollection);
 
-        completer = new QCompleter();
+//        completer = new QCompleter();
     //    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
-        completer->setModel(databaseCollection);
-        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        completer->setWrapAround(false);
-        getQueryRequestView()->setCompleter(completer);
+//        completer->setModel(databaseCollection);
+//        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+//        completer->setCaseSensitivity(Qt::CaseInsensitive);
+//        completer->setWrapAround(false);
+//        getQueryRequestView()->setCompleter(completer);
 
 //        completer->setModel(databaseCollection);
 //        QObject::connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));

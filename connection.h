@@ -1,7 +1,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include "textedit.h"
+/*#include "textedit.h"*/
 #include "connectioninfo.h"
 
 #include <QObject>
@@ -41,7 +41,7 @@ protected:
     QObject* parent = nullptr;
     QTreeView* databaseListView = nullptr;
     QTableView* queryResultView = nullptr;
-    TextEdit* queryRequestView = nullptr;
+//    TextEdit* queryRequestView = nullptr;
     QTextEdit* informationView = nullptr;
     QCompleter* completer = nullptr;
     QStandardItemModel* databaseCollection = nullptr;
@@ -66,15 +66,18 @@ public:
 
     void setQueryResultView(QTableView* queryResultView);
     QTableView* getQueryResultView() const;
-
+/*
     void setQueryRequestView(TextEdit* queryRequestView);
     TextEdit* getQueryRequestView() const;
-
+*/
     void setInformationView(QTextEdit* informationView);
     QTextEdit* getInformationView() const;
 
     void setConnectionInfo(ConnectionInfo* connectionInfo);
     ConnectionInfo* getConnectionInfo() const;
+
+    void setDatabaseCollection(QStandardItemModel*);
+    QStandardItemModel* getDatabaseCollection();
 
     QString generateLastExecutedQuery(const QSqlQuery& query);
 

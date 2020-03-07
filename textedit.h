@@ -51,6 +51,8 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
+#include "connection.h"
+
 #include <QTextEdit>
 #include <QList>
 
@@ -63,11 +65,11 @@ class TextEdit : public QTextEdit
     Q_OBJECT
 
 public:
-    TextEdit(QWidget *parent = nullptr);
+    TextEdit(Connection* connection, QWidget *parent = nullptr);
     ~TextEdit() override;
 
-    void setCompleter(QCompleter *completer);
-    QCompleter* getCompleter() const;
+    void setConnection(Connection*);
+    Connection* getConnection();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -77,7 +79,9 @@ private slots:
     void insertCompletion(const QString &completion);
 
 private:
+    void ensureCompleterExists();
     QString textNearCursor(int movePosition) const;
+    Connection* connection = nullptr;
     QCompleter* completer = nullptr;
     QList<QString> tableRelevantWords; // persist all words that are available for tables like FROM and JOIN
 };

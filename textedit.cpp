@@ -60,41 +60,31 @@
 
 #include <QDebug>
 
-TextEdit::TextEdit(QWidget *parent)
-    : QTextEdit(parent) {
-
-//    setPlainText(tr("This TextEdit provides autocompletions for words that have more than 3 characters. You can trigger autocompletion using ") +
-//        QKeySequence("Ctrl+E").toString(QKeySequence::NativeText));
+TextEdit::TextEdit(Connection* connection, QWidget *parent)
+    : QTextEdit(parent),
+      connection(connection)
+{
 }
 
 TextEdit::~TextEdit() {
 }
 
-void TextEdit::setCompleter(QCompleter *passedCompleter) {
-    if (completer) {
-        completer->disconnect(this);
-    }
-
-    completer = passedCompleter;
-
-    if (!completer) {
-        return;
-    }
-
-    completer->setWidget(this);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    QObject::connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, &TextEdit::insertCompletion);
+void TextEdit::setConnection(Connection* connection) {
+    this->connection = connection;
 }
 
-QCompleter *TextEdit::getCompleter() const {
-    return completer;
+Connection* TextEdit::getConnection() {
+    return this->connection;
 }
 
 void TextEdit::insertCompletion(const QString &completion) {
+    qDebug() << "TextEdit::insertCompletion " << completion;
+
     if (completer->widget() != this) {
         return;
     }
+
+    qDebug() << "Widget is valid!";
 
     QTextCursor tc = textCursor();
     int extra = completion.length() - completer->completionPrefix().length();
@@ -128,33 +118,52 @@ QString TextEdit::textNearCursor(int movePosition = 0) const {
 }
 
 void TextEdit::focusInEvent(QFocusEvent *event) {
+    qDebug() << "TextEdit::focusInEvent!";
     if (completer) {
         completer->setWidget(this);
     }
     QTextEdit::focusInEvent(event);
 }
 
-void TextEdit::keyPressEvent(QKeyEvent *event) {
-    if (completer
-        && completer->popup()->isVisible()
+void TextEdit::ensureCompleterExists() {
+    qDebug() << "TextEdit::ensureCompleterExists";
+    if (nullptr == completer) {
+        completer = new QCompleter();
+        QObject::connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, &TextEdit::insertCompletion);
+    }
+
+    if (nullptr != connection
+        && nullptr != connection->getDatabaseCollection()
     ) {
-        // The following keys are forwarded by the completer to the widget
-       switch (event->key()) {
-       case Qt::Key_Enter:
-       case Qt::Key_Return:
-       case Qt::Key_Escape:
-       case Qt::Key_Tab:
-       case Qt::Key_Backtab:
+        completer->setModel(connection->getDatabaseCollection());
+        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    }
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    completer->setWidget(this);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+}
+
+void TextEdit::keyPressEvent(QKeyEvent *event) {
+    ensureCompleterExists();
+
+    // The following keys are forwarded by the completer to the widget
+    switch (event->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
             event->ignore();
             return; // let the completer do default behavior
-       default:
-           break;
-       }
+        default:
+            break;
     }
 
     const bool isShortcut = (event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Space); // CTRL+Space
+
     if (!completer || !isShortcut) {// do not process the shortcut when we not have a completer
-//    if (!completer) {// do not process the shortcut when we not have a completer
         QTextEdit::keyPressEvent(event);
     }
 
@@ -197,5 +206,5 @@ void TextEdit::keyPressEvent(QKeyEvent *event) {
 
     QRect curRect = cursorRect();
     curRect.setWidth(completer->popup()->sizeHintForColumn(0) + completer->popup()->verticalScrollBar()->sizeHint().width());
-    completer->complete(curRect); // popup it up!
+    completer->complete(curRect);
 }
