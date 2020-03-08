@@ -12,7 +12,7 @@ class SideBar : public QWidget
 public:
     explicit SideBar(QWidget *parent = nullptr);
     void addReleaseNote(ReleaseNote *releaseNote);
-    ReleaseNote *addReleaseNote(const QString &title, const QString &content, const QDate &releaseDate);
+    ReleaseNote *addReleaseNote(const QString &title, const QString& version, const QString &content, const QDate &releaseDate);
     QSize minimumSizeHint() const;
 
 signals:

@@ -19,7 +19,7 @@ namespace Defaults {
 }
 
 namespace Application {
-    const QString BuildNo = "0.0.9";
+    const QString BuildNo = "0.1.0";
     const QString UpdateHost = "byte-artist.de";
     const QString UpdateFile = "update.xml";
     const QString UpdatePath = "/DBManager";

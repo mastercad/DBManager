@@ -15,7 +15,7 @@ public:
     void parse(QNetworkReply*);
 private:
     QNetworkAccessManager networkManager;
-    ReleaseNote* createReleaseNote(const QString& name, const QString &content, const QString& date);
+    ReleaseNote* createReleaseNote(const QString& name, const QString& version, const QString &content, const QString& date);
 };
 
 #endif // RELEASENOTESPARSER_H

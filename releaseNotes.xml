@@ -1,18 +1,23 @@
 <?xml version="1.0"?>
 <ReleaseNotes>
     <ReleaseNote>
-        <Name>Wieder eine Releasenote</Name>
-        <Date>12.02.2020</Date>
-        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird.</Content>
-    </ReleaseNote>
-    <ReleaseNote>
-        <Name>Eine weitere Releasenote</Name>
-        <Date>11.02.2020</Date>
-        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird. hier ist ein manueller umbruch.</Content>
-    </ReleaseNote>
-    <ReleaseNote>
-        <Name>Erste Releasenote</Name>
-        <Date>10.02.2020</Date>
-        <Content>Das ist Quasi der Testcontent meiner ersten Release Note. Hier steht jetzt ein sehr langer Text, um mal zu checken, ob umgebrochen wird.hier ist ein manueller umbruch.</Content>
+        <Name>Releasenotes und Syntax hervorheben implementiert</Name>
+        <Version>0.1.0</Version>
+        <Date>08.03.2020</Date>
+        <Content><![CDATA[
+            <html><body>
+                <div>
+                    <ul>
+                        <li>ReleaseNotes wurden implementiert.</li>
+                        <li>Für den jeweiligen Datenbanktreiber (vorerst nur MySQL) wurde ein Hervorheben der vom System reservierten Worte Implementiert.</li>
+                    </ul>
+
+                    <p>Das Design der ReleaseNotes Anzeige wird noch optimiert werden.</p>
+                    <p><b>Als nächstes Feature wird die Autovervollständigung für Datenbank(en), Tabellen und Spalten implementiert.</b></p>
+                    <p>Dieses Feature wird, wie auch die anderen, vom jeweiligen Datenbanktreiber abhängen.</p>
+                </div>
+            </body></html>
+            ]]>
+        </Content>
     </ReleaseNote>
 </ReleaseNotes>

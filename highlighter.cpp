@@ -27,7 +27,6 @@ Highlighter::Highlighter(QTextDocument *parent, QMap<QString, bool>* keywords)
 
     while (keywordsIterator.hasNext()) {
         keywordsIterator.next();
-        qDebug() << "KEYWORD: " << keywordsIterator.key();
         rule.pattern = QRegularExpression("\\b"+keywordsIterator.key()+"\\b", QRegularExpression::CaseInsensitiveOption);
         rule.format = keywordFormat;
         highlightingRules.append(rule);

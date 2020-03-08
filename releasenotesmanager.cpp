@@ -30,6 +30,7 @@ void ReleaseNotesManager::createReleaseNotes(QNetworkReply* reply) {
     QXmlStreamReader xmlReader(data);
     QString lastElementName;
     QString name;
+    QString version;
     QString content;
     QString releaseDate;
 
@@ -52,12 +53,16 @@ void ReleaseNotesManager::createReleaseNotes(QNetworkReply* reply) {
             && !currentElementContent.isEmpty()
         ) {
             releaseDate = currentElementContent;
+        } else if ("Version" == lastElementName
+           && !currentElementContent.isEmpty()
+        ) {
+            version = currentElementContent;
         }
 
         if ("ReleaseNote" == elementName
             && xmlReader.isEndElement()
         ) {
-            ReleaseNote* releaseNote = new ReleaseNote(name, content, releaseDate);
+            ReleaseNote* releaseNote = new ReleaseNote(name, version, content, releaseDate);
             releaseNotes.append(releaseNote);
         }
 

@@ -84,6 +84,14 @@ QStandardItemModel* Connection::getDatabaseCollection() {
     return this->databaseCollection;
 }
 
+void Connection::setTableNames(QMap<QString, QString>* tableNameCollection) {
+    this->tableNameCollection = tableNameCollection;
+}
+
+QMap<QString, QString>* Connection::getTableNames() {
+    return this->tableNameCollection;
+}
+
 QString Connection::generateLastExecutedQuery(const QSqlQuery& query) {
     /*
     QString sql = query.executedQuery();

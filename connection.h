@@ -45,6 +45,9 @@ protected:
     QTextEdit* informationView = nullptr;
     QCompleter* completer = nullptr;
     QStandardItemModel* databaseCollection = nullptr;
+    // datebase name, table name
+    QMap<QString, QString>* tableNameCollection = nullptr;
+
 //    QStandardItemModel* queryResultModel = nullptr;
 //    QSqlTableModel* queryResultModel = nullptr;
     QSqlRelationalTableModel* queryResultModel = nullptr;
@@ -78,6 +81,9 @@ public:
 
     void setDatabaseCollection(QStandardItemModel*);
     QStandardItemModel* getDatabaseCollection();
+
+    void setTableNames(QMap<QString, QString>*);
+    QMap<QString, QString>* getTableNames();
 
     QString generateLastExecutedQuery(const QSqlQuery& query);
 

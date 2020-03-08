@@ -67,8 +67,8 @@ void SideBar::addReleaseNote(ReleaseNote* releaseNote)
     update();
 }
 
-ReleaseNote *SideBar::addReleaseNote(const QString &title, const QString &content, const QDate &releaseDate) {
-    ReleaseNote *releaseNote = new ReleaseNote(title, content, releaseDate, this);
+ReleaseNote *SideBar::addReleaseNote(const QString &title, const QString& version, const QString &content, const QDate &releaseDate) {
+    ReleaseNote *releaseNote = new ReleaseNote(title, version, content, releaseDate, this);
 //    action->setCheckable(true);
     releaseNotes.push_back(releaseNote);
     update();

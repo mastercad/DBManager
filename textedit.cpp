@@ -78,13 +78,10 @@ Connection* TextEdit::getConnection() {
 }
 
 void TextEdit::insertCompletion(const QString &completion) {
-    qDebug() << "TextEdit::insertCompletion " << completion;
 
     if (completer->widget() != this) {
         return;
     }
-
-    qDebug() << "Widget is valid!";
 
     QTextCursor tc = textCursor();
     int extra = completion.length() - completer->completionPrefix().length();
@@ -118,7 +115,6 @@ QString TextEdit::textNearCursor(int movePosition = 0) const {
 }
 
 void TextEdit::focusInEvent(QFocusEvent *event) {
-    qDebug() << "TextEdit::focusInEvent!";
     if (completer) {
         completer->setWidget(this);
     }
@@ -126,7 +122,6 @@ void TextEdit::focusInEvent(QFocusEvent *event) {
 }
 
 void TextEdit::ensureCompleterExists() {
-    qDebug() << "TextEdit::ensureCompleterExists";
     if (nullptr == completer) {
         completer = new QCompleter();
         QObject::connect(completer, QOverload<const QString &>::of(&QCompleter::activated), this, &TextEdit::insertCompletion);
@@ -163,14 +158,17 @@ void TextEdit::keyPressEvent(QKeyEvent *event) {
 
     const bool isShortcut = (event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Space); // CTRL+Space
 
-    if (!completer || !isShortcut) {// do not process the shortcut when we not have a completer
+    if (!isShortcut) {
+        qDebug() << "Taste ist kein shortcur für completion!";
         QTextEdit::keyPressEvent(event);
+        return;
     }
 
+    qDebug() << "Shortcut für completion erkannt!";
     const bool ctrlOrShift = event->modifiers().testFlag(Qt::ControlModifier) || event->modifiers().testFlag(Qt::ShiftModifier);
 
-    if (!completer
-        || (ctrlOrShift && event->text().isEmpty())
+    if (ctrlOrShift
+        && event->text().isEmpty()
     ) {
         return;
     }

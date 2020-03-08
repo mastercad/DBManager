@@ -13,17 +13,17 @@
 
 int ReleaseNote::notesCount = 0;
 
-ReleaseNote::ReleaseNote(const QString &name, const QString &content, const QDate &releaseDate, QWidget *parent) :
+ReleaseNote::ReleaseNote(const QString &name, const QString& version, const QString &content, const QDate &releaseDate, QWidget *parent) :
     QWidget(parent),
     name(name),
     content(content),
     releaseDate(releaseDate)
 {
     ++ReleaseNote::notesCount;
-    init(name, content, releaseDate);
+    init(name, version, content, releaseDate);
 }
 
-ReleaseNote::ReleaseNote(const QString &name, const QString &content, const QString &releaseDateStr, QWidget *parent) :
+ReleaseNote::ReleaseNote(const QString &name, const QString& version, const QString &content, const QString &releaseDateStr, QWidget *parent) :
     QWidget(parent),
     name(name),
     content(content),
@@ -31,10 +31,10 @@ ReleaseNote::ReleaseNote(const QString &name, const QString &content, const QStr
 {
     ++ReleaseNote::notesCount;
     releaseDate = convertReleaseDateString(releaseDateStr);
-    init(name, content, releaseDate);
+    init(name, version, content, releaseDate);
 }
 
-void ReleaseNote::init(const QString& name, const QString& content, const QDate& releaseDate) {
+void ReleaseNote::init(const QString& name, const QString& version, const QString& content, const QDate& releaseDate) {
     // give name to have a possibility to call with specific stylesheet, but seems this does not work, nor ReleaseNote either #releaseNote_1
     this->setObjectName(QString("releaseNote_") + QString::number(ReleaseNote::notesCount));
 
@@ -42,7 +42,7 @@ void ReleaseNote::init(const QString& name, const QString& content, const QDate&
 
     layoutContainer->addWidget(createTitleElement(releaseDate));
 
-    layoutContainer->addLayout(createNameElement(name));
+    layoutContainer->addLayout(createNameElement(name, version));
 
     layoutContainer->addWidget(createContentElement(content));
 
@@ -59,7 +59,7 @@ QLabel* ReleaseNote::createTitleElement(const QDate& releaseDate) {
     return titleLabel;
 }
 
-QHBoxLayout* ReleaseNote::createNameElement(const QString& name) {
+QHBoxLayout* ReleaseNote::createNameElement(const QString& name, const QString& version) {
     QHBoxLayout* nameLayout = new QHBoxLayout;
     QIcon* nameIcon = new QIcon(":/icons/programm_icon.png");
 
@@ -70,6 +70,7 @@ QHBoxLayout* ReleaseNote::createNameElement(const QString& name) {
 
     QLabel* nameLabel = new QLabel;
     nameLabel->setText(name);
+    nameLabel->setWordWrap(true);
     nameLabel->setStyleSheet("padding-top: 0; padding-right: 20px; padding-left: 0; padding-bottom: 0; font-weight: bold; background-color: white; margin-bottom: 0; border-left: 0; border-right: 1px solid lightgrey;");
     nameLabel->setAlignment(Qt::AlignLeft);
 
@@ -77,7 +78,7 @@ QHBoxLayout* ReleaseNote::createNameElement(const QString& name) {
 
     QVBoxLayout* versionInformationLayout = new QVBoxLayout;
     QLabel* versionNumberLabel = new QLabel;
-    versionNumberLabel->setText("Version "+Application::BuildNo);
+    versionNumberLabel->setText("Version "+version);
     versionNumberLabel->setStyleSheet("font-size: 9px; font-style: italic; color: grey; italic; padding-top: 0; padding-right: 20px; padding-left: 0; padding-bottom: 0; font-weight: bold; background-color: white; margin-bottom: 0; border-left: 0; border-right: 1px solid lightgrey;");
 
     versionInformationLayout->addWidget(nameLabel);
@@ -95,6 +96,7 @@ QLabel* ReleaseNote::createContentElement(const QString& content) {
     QLabel* contentLabel = new QLabel;
     contentLabel->setStyleSheet("padding-top: 10; padding-right: 20px; padding-left: 20px; padding-bottom: 20px; background-color: white; margin-top: 0; border-bottom: 1px solid lightgrey; border-left: 1px solid lightgrey; border-right: 1px solid lightgrey;");
     contentLabel->setText(content);
+    contentLabel->setTextFormat(Qt::RichText);
     contentLabel->setWordWrap(true);
 
     return contentLabel;

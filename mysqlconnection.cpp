@@ -112,6 +112,14 @@ void MysqlConnection::collectTableInformations() {
     query.exec("SELECT * FROM KEY_COLUMN_USAGES");
 
     query.exec("SELECT * FROM TABLES");
+    tableNameCollection = new QMap<QString, QString>;
+    if (query.isActive()) {
+        while (query.next()) {
+            if ("BASE TABLE" == query.value(3)) {
+                tableNameCollection->insert(query.value(1).toString(), query.value(2).toString());
+            }
+        }
+    }
 
     query.exec("SELECT * FROM TABLE_CONSTRAINTS");
 
