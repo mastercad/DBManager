@@ -142,16 +142,20 @@ void TextEdit::ensureCompleterExists() {
 
 void TextEdit::keyPressEvent(QKeyEvent *event) {
     ensureCompleterExists();
+    qDebug() << "TextEdit::keyPressEvent Text: " << event->text();
 
     // The following keys are forwarded by the completer to the widget
     switch (event->key()) {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
+//        case Qt::Key_Enter:
+//        case Qt::Key_Return:
         case Qt::Key_Escape:
-        case Qt::Key_Tab:
+//        case Qt::Key_Tab:
         case Qt::Key_Backtab:
             event->ignore();
             return; // let the completer do default behavior
+        case Qt::Key_Tab:
+            this->insertPlainText("    ");
+            return;
         default:
             break;
     }

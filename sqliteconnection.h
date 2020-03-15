@@ -20,6 +20,7 @@ public:
     void init();
 
 public slots:
+    void addNewRow();
     void onListViewDoubleClicked(const QModelIndex index);
     void showDatabaseContextMenu(const QPoint& position);
     void showResultTableContextMenu(const QPoint& position);

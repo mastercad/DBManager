@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAboutDBManager, SIGNAL(triggered()), this, SLOT(showAboutText()));
 
     connect(ui->actionCheckForUpdates, SIGNAL(triggered()), this->updateManager, SLOT(checkUpdateAvailable()));
-    connect(ui->actionSideBar, SIGNAL(triggered(bool)), this, SLOT(showReleaseNotes()));
+    connect(ui->actionReleaseNotes, SIGNAL(triggered(bool)), this, SLOT(showReleaseNotes()));
 
     this->updateManager->checkUpdateAvailable(false);
 }
@@ -474,6 +474,7 @@ Connection* MainWindow::establishNewConnection(ConnectionInfo* connectionInfo) {
     ui->queryResult->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->queryResult, SIGNAL(customContextMenuRequested(QPoint)), this->dbConnection, SLOT(showResultTableContextMenu(QPoint)));
 
+    connect(ui->btnAddNewRow, SIGNAL(clicked()), this->dbConnection, SLOT(addNewRow()));
     connect(ui->btnQueryResultSave, SIGNAL(clicked()), this->dbConnection, SLOT(saveQueryResultChanges()));
     connect(ui->btnQueryResultCancel, SIGNAL(clicked()), this->dbConnection, SLOT(cancelQueryResultChanges()));
 

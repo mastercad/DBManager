@@ -24,6 +24,7 @@ private:
     QStandardItem* currentContextMenuItem = nullptr;
 
 public slots:
+    void addNewRow();
     void onListViewDoubleClicked(const QModelIndex index);
     void saveQueryResultChanges();
     void cancelQueryResultChanges();

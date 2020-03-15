@@ -13,6 +13,9 @@
 #include <QSqlField>
 #include <QModelIndex>
 #include <QMimeData>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QLineEdit>
 #include <QList>
 #include <QMenu>
 #include <QFont>
@@ -37,9 +40,12 @@ void MysqlConnection::loadDatabaseList() {
     database.open();
     QSqlQuery query(database);
 //            query.setForwardOnly(true);
+
     query.exec("SHOW DATABASES");
 
     if (query.isActive()) {
+        databaseCollection = nullptr;
+        delete databaseCollection;
         databaseCollection = new QStandardItemModel(query.size(), 1);
         int row = 0;
 
@@ -52,18 +58,6 @@ void MysqlConnection::loadDatabaseList() {
         }
         getDatabaseListView()->header()->hide();
         getDatabaseListView()->setModel(databaseCollection);
-
-//        completer = new QCompleter();
-    //    completer->setModel(modelFromFile(":/resources/wordlist.txt"));
-//        completer->setModel(databaseCollection);
-//        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-//        completer->setCaseSensitivity(Qt::CaseInsensitive);
-//        completer->setWrapAround(false);
-//        getQueryRequestView()->setCompleter(completer);
-
-//        completer->setModel(databaseCollection);
-//        QObject::connect(getDatabaseListView(), SIGNAL(doubleClicked(QModelIndex)), this, SLOT(onListViewDoubleClicked(const QModelIndex)));
-//        connect(getDatabaseListView(), SIGNAL(clicked(QModelIndex)), this, SLOT(onListViewClicked(const QModelIndex)));
 
         collectTableInformations();
 
@@ -112,6 +106,8 @@ void MysqlConnection::collectTableInformations() {
     query.exec("SELECT * FROM KEY_COLUMN_USAGES");
 
     query.exec("SELECT * FROM TABLES");
+    tableNameCollection = nullptr;
+    delete tableNameCollection;
     tableNameCollection = new QMap<QString, QString>;
     if (query.isActive()) {
         while (query.next()) {
@@ -129,6 +125,8 @@ void MysqlConnection::collectTableInformations() {
 
     query.exec("SELECT * FROM KEYWORDS");
 
+    keywords = nullptr;
+    delete keywords;
     keywords = new QMap<QString, bool>();
 
     if (query.isActive()) {
@@ -164,22 +162,90 @@ void MysqlConnection::showDatabaseContextMenu(const QPoint& position) {
 
 void MysqlConnection::truncateTable() {
     if (nullptr != currentContextMenuItem) {
-        qDebug() << "Truncate!";
-        qDebug() << currentContextMenuItem->text();
+
+        QMessageBox msgBox;
+        msgBox.setText(tr("Truncate Table"));
+        msgBox.setInformativeText(tr("Press OK to truncate selected Table!"));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+
+        if (msgBox.exec()) {
+            emit databaseCollection->layoutAboutToBeChanged();
+            this->database.exec("TRUNCATE TABLE "+currentContextMenuItem->text());
+
+            this->queryResultView->setModel(nullptr);
+            delete this->queryResultModel;
+            this->queryResultModel = nullptr;
+            emit databaseCollection->layoutChanged();
+        }
     }
 }
 
 void MysqlConnection::deleteTable() {
     if (nullptr != currentContextMenuItem) {
-        qDebug() << "Delete!";
-        qDebug() << currentContextMenuItem->text();
+
+        QMessageBox msgBox;
+        msgBox.setText(tr("Delete Table"));
+        msgBox.setInformativeText(tr("Press OK to drop selected Table!"));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+
+        if (msgBox.exec()) {
+            emit databaseCollection->layoutAboutToBeChanged();
+            this->database.exec("DROP TABLE "+currentContextMenuItem->text());
+
+            QSqlQuery query = sendQuery("SHOW TABLES");
+
+            QFont font;
+            font.setBold(true);
+            currentDatabaseItem->setFont(font);
+            currentDatabaseItem->removeRows(0, databaseCollection->item(currentDatabaseItem->row())->rowCount());
+            while (query.next()) {
+                QString tableName = query.value(0).toString();
+                QStandardItem* item = new QStandardItem(tableName);
+                item->setToolTip(tableName);
+                item->setEditable(false);
+                currentDatabaseItem->appendRow(item);
+            }
+            emit databaseCollection->layoutChanged();
+        }
     }
 }
 
 void MysqlConnection::renameTable() {
     if (nullptr != currentContextMenuItem) {
-        qDebug() << "Rename!";
-        qDebug() << currentContextMenuItem->text();
+        bool ok;
+        QString text = QInputDialog::getText(
+            (QWidget*)this->parent,
+            tr("QInputDialog::getText()"),
+            tr("Table Name:"),
+            QLineEdit::Normal,
+            currentContextMenuItem->text(),
+            &ok
+        );
+
+        if (ok
+            && !text.isEmpty()
+            && text != currentContextMenuItem->text()
+        ) {
+            emit databaseCollection->layoutAboutToBeChanged();
+            this->database.exec("ALTER TABLE "+currentContextMenuItem->text()+" RENAME TO "+text+";");
+
+            QSqlQuery query = sendQuery("SHOW TABLES");
+
+            QFont font;
+            font.setBold(true);
+            currentDatabaseItem->setFont(font);
+            currentDatabaseItem->removeRows(0, databaseCollection->item(currentDatabaseItem->row())->rowCount());
+            while (query.next()) {
+                QString tableName = query.value(0).toString();
+                QStandardItem* item = new QStandardItem(tableName);
+                item->setToolTip(tableName);
+                item->setEditable(false);
+                currentDatabaseItem->appendRow(item);
+            }
+            emit databaseCollection->layoutChanged();
+        }
     }
 }
 
@@ -481,6 +547,12 @@ void MysqlConnection::saveQueryResultChanges() {
 void MysqlConnection::cancelQueryResultChanges() {
     qDebug() << "Cancel QueryResultChanges!";
 
-    this->queryResultModel->revertAll();
-    this->queryResultModel->database().rollback();
+    if (nullptr != this->queryResultModel) {
+        this->queryResultModel->revertAll();
+        this->queryResultModel->database().rollback();
+    }
+}
+
+void MysqlConnection::addNewRow() {
+    this->queryResultModel->insertRow(this->queryResultModel->rowCount());
 }

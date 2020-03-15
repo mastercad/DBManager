@@ -139,3 +139,6 @@ void SqliteConnection::onListViewDoubleClicked(const QModelIndex index) {
     handleTableClicked(index);
 }
 
+void SqliteConnection::addNewRow() {
+
+}

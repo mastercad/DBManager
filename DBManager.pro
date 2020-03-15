@@ -37,6 +37,7 @@ QT_PLUGIN_PATH=`pwd`
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    syntaxformatter.cpp \
     textedit.cpp \
     connectionfactory.cpp \
     newconnectionwizard.cpp \
@@ -68,6 +69,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    syntaxformatter.h \
     textedit.h \
     connectionfactory.h \
     newconnectionwizard.h \

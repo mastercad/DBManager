@@ -4,11 +4,11 @@
     <Update>
       <Application>
           <BuildNo>
-              0.0.9
+              0.1.0
           </BuildNo>
       </Application>
       <Files>
-          <File size="503428">
+          <File size="549333">
               <![CDATA[DBManager.tar.gz]]>
           </File>
       </Files>

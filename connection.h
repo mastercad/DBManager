@@ -99,6 +99,7 @@ public:
     QSqlQuery sendQuery(QString queryString);
 
 public slots:
+    virtual void addNewRow() = 0;
     virtual void onListViewDoubleClicked(const QModelIndex index) = 0;
     virtual void showDatabaseContextMenu(const QPoint& position) = 0;
     virtual void showResultTableContextMenu(const QPoint& position) = 0;

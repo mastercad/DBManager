@@ -292,7 +292,14 @@
         </property>
        </widget>
        <widget class="QWidget" name="horizontalLayoutWidget">
-        <layout class="QHBoxLayout" name="queryResultOptionsContainer" stretch="0,0,0,0,0">
+        <layout class="QHBoxLayout" name="queryResultOptionsContainer" stretch="0,0,0,0,0,0">
+         <item>
+          <widget class="QPushButton" name="btnAddNewRow">
+           <property name="text">
+            <string>new row</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QPushButton" name="btnQueryResultRedo">
            <property name="text">
@@ -370,7 +377,7 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="sideBarLayout" stretch="">
+        <layout class="QVBoxLayout" name="sideBarLayout">
          <property name="sizeConstraint">
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
@@ -414,16 +421,10 @@
     </property>
     <addaction name="actionAboutDBManager"/>
     <addaction name="actionCheckForUpdates"/>
-   </widget>
-   <widget class="QMenu" name="menuSideBar">
-    <property name="title">
-     <string>sidebar</string>
-    </property>
-    <addaction name="actionSideBar"/>
+    <addaction name="actionReleaseNotes"/>
    </widget>
    <addaction name="menuMain_Tool_Bar"/>
    <addaction name="menuHilfe"/>
-   <addaction name="menuSideBar"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -486,6 +487,11 @@
   <action name="actionSideBar">
    <property name="text">
     <string>sidebar</string>
+   </property>
+  </action>
+  <action name="actionReleaseNotes">
+   <property name="text">
+    <string>Release Notes</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,7 @@
                     <ul>
                         <li>ReleaseNotes wurden implementiert.</li>
                         <li>Für den jeweiligen Datenbanktreiber (vorerst nur MySQL) wurde ein Hervorheben der vom System reservierten Worte Implementiert.</li>
+                        <li>Bug entfernt, der die Application abstürzen ließ, wenn man cancel drückte ohne Daten angezeigt zu haben.
                     </ul>
 
                     <p>Das Design der ReleaseNotes Anzeige wird noch optimiert werden.</p>
